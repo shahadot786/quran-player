@@ -38,6 +38,7 @@ A modern, fast, and feature-rich Holy Quran audio player built with **Next.js 16
 git clone https://github.com/shahadot786/quran-player.git
 cd quran-player
 yarn install
+cp .env.example .env.local
 ```
 
 ### Running Locally
@@ -76,7 +77,7 @@ This project is optimized for deployment on [Vercel](https://vercel.com):
 1. **Push to GitHub**: Push your changes to your GitHub repository.
 2. **Import Project**: In the Vercel dashboard, click **"Add New Project"** and select `quran-player`.
 3. **Environment Variables**:
-   - `NEXT_PUBLIC_SITE_URL`: Set your production URL (e.g., `https://quran-player-gamma.vercel.app` or custom domain) for accurate canonical URLs, OpenGraph image tags, and sitemap generation.
+   - `NEXT_PUBLIC_SITE_URL`: Set your production URL (`https://tilawah.shahadot.dev`) for accurate canonical URLs, OpenGraph image tags, and sitemap generation.
 4. **Deploy**: Click **Deploy**. Vercel will build and launch your application globally.
 
 ## Contributing

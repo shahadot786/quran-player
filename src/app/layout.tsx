@@ -10,6 +10,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 const manrope = Manrope({ variable: "--font-sans", subsets: ["latin"] });
 const amiri = Amiri({ variable: "--font-arabic", subsets: ["arabic"], weight: ["400", "700"] });
@@ -17,10 +18,9 @@ const amiri = Amiri({ variable: "--font-arabic", subsets: ["arabic"], weight: ["
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app");
   const locale = await getLocale();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://quran-player-gamma.vercel.app";
 
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(SITE_URL),
     applicationName: t("name"),
     title: {
       default: `${t("name")}: ${t("tagline")}`,
@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: locale === "bn" ? "bn_BD" : "en_US",
-      url: siteUrl,
+      url: SITE_URL,
       title: `${t("name")}: ${t("tagline")}`,
       description: t("description"),
       siteName: t("name"),

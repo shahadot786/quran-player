@@ -37,7 +37,7 @@ jobs:
       - name: Build Next.js Production App
         run: yarn build
         env:
-          NEXT_PUBLIC_SITE_URL: https://quran-player-gamma.vercel.app
+          NEXT_PUBLIC_SITE_URL: https://tilawah.shahadot.dev
 
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps chromium

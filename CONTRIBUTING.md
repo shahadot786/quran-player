@@ -13,6 +13,7 @@ Thank you for your interest in contributing to Quran Player! We welcome bug repo
    git clone https://github.com/shahadot786/quran-player.git
    cd quran-player
    yarn install
+   cp .env.example .env.local
    ```
 
 3. **Run Development Server**
