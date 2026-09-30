@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { Check, Copy, Minus, Plus, RefreshCw } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Check, Copy, Minus, Play, Plus, RefreshCw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { useAyahSync } from "@/hooks/use-ayah-sync";
 import { getLocalizedSurahName, toBengaliDigits } from "@/lib/bengali-data";
 import { BISMILLAH_ARABIC, getSurahText, type SurahText } from "@/lib/quran-text";
 import { getSurah } from "@/lib/surahs";
+import { cn } from "@/lib/utils";
 import { selectCurrentTrack, usePlayerStore } from "@/stores/player-store";
 
 const FONT_SIZES = [
@@ -19,6 +21,33 @@ const FONT_SIZES = [
   { label: "lg", arabicClass: "text-2xl sm:text-3xl", lineClass: "leading-loose" },
   { label: "xl", arabicClass: "text-3xl sm:text-4xl", lineClass: "leading-loose" },
 ] as const;
+
+const USER_SCROLL_PAUSE_MS = 6000;
+
+function SyncStatus({ status }: { status: "unavailable" | "loading" | "ready" }) {
+  const t = useTranslations("playerPage.liveQuran");
+  if (status === "ready") {
+    return (
+      <p className="flex items-center gap-2 text-xs font-medium text-primary" role="status">
+        <span className="size-2 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden />
+        {t("syncOn")}
+      </p>
+    );
+  }
+  if (status === "loading") return <p className="text-xs text-muted-foreground" role="status">{t("syncLoading")}</p>;
+  return <p className="text-xs text-muted-foreground" role="status">{t("syncNone")}</p>;
+}
+
+// Scrolls the nearest scrollable ancestor rather than the whole page, so following along never yanks the layout.
+function centerInView(element: HTMLElement, behavior: ScrollBehavior) {
+  let parent = element.parentElement;
+  while (parent && parent.scrollHeight <= parent.clientHeight + 1) parent = parent.parentElement;
+  const container = parent && parent !== document.body ? parent : document.scrollingElement;
+  if (!container) return;
+  const box = container === document.scrollingElement ? { top: 0, height: window.innerHeight } : container.getBoundingClientRect();
+  const offset = element.getBoundingClientRect().top - box.top - (box.height - element.offsetHeight) / 2;
+  container.scrollBy({ top: offset, behavior });
+}
 
 export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
   const t = useTranslations();
@@ -33,6 +62,16 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
   const [fontSizeIndex, setFontSizeIndex] = useState(1);
   const [showBengali, setShowBengali] = useState(true);
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
+  const [follow, setFollow] = useState(true);
+  const followId = useId();
+  const listRef = useRef<HTMLUListElement>(null);
+  const bismillahRef = useRef<HTMLDivElement>(null);
+  const userScrolledAt = useRef(0);
+  const previousActive = useRef<number | null>(null);
+
+  const playing = currentTrack && currentTrack.surah === activeSurahId ? currentTrack : undefined;
+  const sync = useAyahSync(playing);
+  const active = sync.active;
 
   const loading = loadedSurahId !== activeSurahId && !error;
 
@@ -57,6 +96,33 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
       cancelled = true;
     };
   }, [activeSurahId]);
+
+  useEffect(() => {
+    if (!follow || active === null) return;
+    const jumped = previousActive.current !== null && Math.abs(active - previousActive.current) > 1;
+    previousActive.current = active;
+    if (!jumped && Date.now() - userScrolledAt.current < USER_SCROLL_PAUSE_MS) return;
+    const element = active === 0 ? bismillahRef.current : listRef.current?.querySelector<HTMLElement>(`[data-ayah="${active}"]`);
+    if (!element) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    centerInView(element, reduced ? "auto" : "smooth");
+  }, [active, follow, data]);
+
+  useEffect(() => {
+    const markScrolled = () => {
+      userScrolledAt.current = Date.now();
+    };
+    const events = ["wheel", "touchmove"] as const;
+    events.forEach((name) => window.addEventListener(name, markScrolled, { passive: true }));
+    return () => events.forEach((name) => window.removeEventListener(name, markScrolled));
+  }, []);
+
+  const playFrom = (seconds: number) => {
+    const player = usePlayerStore.getState();
+    player.seek(seconds);
+    userScrolledAt.current = 0;
+    if (!player.isPlaying) player.play();
+  };
 
   const surahMeta = getSurah(activeSurahId);
   const localizedSurahName = surahMeta ? getLocalizedSurahName(surahMeta, locale) : data?.name;
@@ -141,6 +207,17 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
           </div>
         </div>
 
+        <SyncStatus status={sync.status} />
+
+        {sync.status === "ready" && (
+          <div className="flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+            <label htmlFor={followId} className="cursor-pointer text-muted-foreground select-none">
+              {t("playerPage.liveQuran.follow")}
+            </label>
+            <Switch id={followId} checked={follow} onCheckedChange={setFollow} aria-label={t("playerPage.liveQuran.follow")} />
+          </div>
+        )}
+
         {/* Translation toggle */}
         <div className="flex items-center justify-between border-t border-border/50 pt-2 text-xs">
           <label htmlFor={switchId} className="cursor-pointer text-muted-foreground select-none">
@@ -204,7 +281,14 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
         <div className="flex flex-col gap-3">
           {/* Bismillah Banner (Surahs other than 1 and 9) */}
           {data.bismillahPre && (
-            <div className="flex flex-col items-center justify-center rounded-xl bg-primary/5 border border-primary/15 py-4 px-3 text-center">
+            <div
+              ref={bismillahRef}
+              data-active={active === 0 || undefined}
+              className={cn(
+                "flex flex-col items-center justify-center rounded-xl border border-primary/15 bg-primary/5 px-3 py-4 text-center transition-colors",
+                active === 0 && "border-primary bg-primary/15 ring-2 ring-primary/40",
+              )}
+            >
               <p
                 className="font-arabic text-2xl sm:text-3xl text-primary leading-relaxed"
                 dir="rtl"
@@ -221,16 +305,23 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
           )}
 
           {/* Ayahs list */}
-          <ul className="flex flex-col gap-3">
+          <ul ref={listRef} className="flex flex-col gap-3">
             {data.ayahs.map((ayah) => {
               const ayahNumFormatted =
                 locale === "bn" ? toBengaliDigits(ayah.numberInSurah) : ayah.numberInSurah;
               const isCopied = copiedAyah === ayah.numberInSurah;
+              const isActive = active === ayah.numberInSurah;
+              const timing = sync.timings?.ayahs.find((entry) => entry.ayah === ayah.numberInSurah);
 
               return (
                 <li
                   key={ayah.numberInSurah}
-                  className="group relative flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/20"
+                  data-ayah={ayah.numberInSurah}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "group relative flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/20",
+                    isActive && "border-primary bg-primary/10 ring-2 ring-primary/40 hover:bg-primary/10",
+                  )}
                 >
                   {/* Ayah Header with number badge and copy button */}
                   <div className="flex items-center justify-between border-b border-border/40 pb-2">
@@ -238,6 +329,18 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
                       {t("playerPage.liveQuran.ayah", { number: ayahNumFormatted })}
                     </span>
 
+                    <div className="flex items-center gap-1">
+                    {timing && (
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        onClick={() => playFrom(timing.start)}
+                        aria-label={t("playerPage.liveQuran.playFromAyah", { number: ayahNumFormatted })}
+                        title={t("playerPage.liveQuran.playFromAyah", { number: ayahNumFormatted })}
+                      >
+                        <Play className="size-3" fill="currentColor" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon-xs"
@@ -248,6 +351,7 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
                     >
                       {isCopied ? <Check className="size-3 text-primary" /> : <Copy className="size-3" />}
                     </Button>
+                    </div>
                   </div>
 
                   {/* Arabic Ayah Text */}

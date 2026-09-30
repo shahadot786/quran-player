@@ -1,4 +1,5 @@
 import { SURAHS } from "../surahs";
+import { isSynced } from "./timings";
 import type { Moshaf, Reciter, SourceMoshaf, SourceReciter } from "../types";
 
 const PARTICLES = new Set(["al", "el", "ash", "as", "ad", "ar", "at", "az", "an", "bin", "ibn", "ben", "shaik", "shaikh", "sheikh", "shaykh", "imam", "qari"]);
@@ -76,10 +77,10 @@ export function isComplete(moshaf: SourceMoshaf) {
 }
 
 function toMoshaf({ id, name, server, padded, downloadable }: SourceMoshaf): Moshaf {
-  return { id, name, server, padded, downloadable };
+  return { id, name, server, padded, downloadable, synced: isSynced({ id, server }) };
 }
 
-type Entry = { reciter: Reciter; variants: Set<string> };
+type Entry = { reciter: Reciter; variants: Map<string, number> };
 
 export function mergeReciters(sources: SourceReciter[][]): Reciter[] {
   const entries: Entry[] = [];
@@ -94,23 +95,29 @@ export function mergeReciters(sources: SourceReciter[][]): Reciter[] {
       const bucket = byKey.get(key) ?? [];
       let entry = bucket.find((e) => sameReciter(e.reciter.name, source.name) && (sourceIndex > 0 || e.reciter.id === source.id));
       if (!entry) {
-        entry = { reciter: { id: source.id, name: source.name, moshafs: [] }, variants: new Set() };
+        entry = { reciter: { id: source.id, name: source.name, moshafs: [] }, variants: new Map() };
         entries.push(entry);
         byKey.set(key, [...bucket, entry]);
       }
 
-      const covered = new Set(entry.variants);
-      for (const moshaf of moshafs) {
-        const variant = variantKey(moshaf.name);
-        if (covered.has(variant)) continue;
-        entry.variants.add(variant);
-        entry.reciter.moshafs.push(toMoshaf(moshaf));
+      const covered = new Map(entry.variants);
+      for (const source of moshafs) {
+        const variant = variantKey(source.name);
+        const moshaf = toMoshaf(source);
+        const existing = covered.get(variant);
+        if (existing === undefined) {
+          entry.variants.set(variant, entry.reciter.moshafs.push(moshaf) - 1);
+        } else if (moshaf.synced && !entry.reciter.moshafs[existing]!.synced) {
+          // A later source only replaces a recitation that can't follow along when its own version can.
+          entry.reciter.moshafs[existing] = moshaf;
+        }
       }
     }
   });
 
   return entries
-    .map((e) => e.reciter)
+    // Array.sort is stable, so recitations keep their source order within each group.
+    .map((e) => ({ ...e.reciter, moshafs: e.reciter.moshafs.toSorted((a, b) => Number(b.synced) - Number(a.synced)) }))
     .filter((r) => r.moshafs.length > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -37,13 +37,13 @@ A modern, fast, and feature-rich Holy Quran audio player built with **Next.js 16
 ```bash
 git clone https://github.com/shahadot786/quran-player.git
 cd quran-player
-npm install
+yarn install
 ```
 
 ### Running Locally
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -54,19 +54,19 @@ Ensure all tests and type checks pass prior to opening a PR:
 
 ```bash
 # Code style and linting
-npm run lint
+yarn lint
 
 # TypeScript verification
-npm run typecheck
+yarn typecheck
 
 # Unit and component test suites (Vitest)
 npm test
 
 # Production build test
-npm run build
+yarn build
 
 # End-to-end integration tests (Playwright)
-npm run test:e2e
+yarn test:e2e
 ```
 
 ## Vercel Deployment

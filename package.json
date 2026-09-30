@@ -7,12 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "surahs": "node scripts/fetch-surahs.mts",
-    "sources": "node scripts/fetch-reciter-sources.mts"
+    "sources": "node scripts/fetch-reciter-sources.mts",
+    "timings": "node scripts/fetch-timing-support.mts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -50,6 +51,7 @@
     "serwist": "^9.5.12",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^8",
     "vitest": "^5.0.2"
   }
 }

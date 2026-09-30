@@ -1,6 +1,7 @@
 import { createStore, del, entries, set, type UseStore } from "idb-keyval";
 import { trackKey, trackUrl } from "./audio-url";
 import { AUDIO_CACHE } from "./cache-names";
+import { timingsUrl } from "./timings";
 import type { Track } from "./types";
 
 export type DownloadRecord = { key: string; track: Track; size: number; savedAt: number };
@@ -60,6 +61,9 @@ export async function downloadTrack(track: Track, onProgress: (ratio: number) =>
     new Response(blob, { headers: { "Content-Type": "audio/mpeg", "Content-Length": String(blob.size) } }),
   );
   await navigator.storage?.persist?.().catch(() => false);
+
+  // Warms the service worker's copy so the text keeps following the recitation offline.
+  if (track.synced !== false) void fetch(timingsUrl(track)).catch(() => undefined);
 
   const record: DownloadRecord = { key: trackKey(track), track, size: blob.size, savedAt: Date.now() };
   await set(record.key, record, records());

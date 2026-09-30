@@ -307,7 +307,12 @@
       "error": "Failed to load verses.",
       "retry": "Retry",
       "copyAyah": "Copy ayah",
-      "copied": "Ayah copied to clipboard"
+      "copied": "Ayah copied to clipboard",
+      "follow": "Follow the recitation",
+      "playFromAyah": "Play from ayah {number}",
+      "syncOn": "Following the recitation ayah by ayah",
+      "syncLoading": "Checking ayah timings…",
+      "syncNone": "Ayah-by-ayah sync isn’t available for this recitation. Choose one marked Synced to follow along."
     },
     "sidebar": {
       "collapse": "Collapse sidebar",
@@ -327,6 +332,8 @@
       "pointB": "End {time}",
       "active": "Repeating {start} to {end}",
       "clear": "Clear loop"
-    }
+    },
+    "synced": "Synced",
+    "syncedOnly": "Synced recitations only"
   }
 }

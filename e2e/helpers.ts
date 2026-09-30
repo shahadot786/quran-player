@@ -51,3 +51,21 @@ export async function playFirstSurah(page: Page) {
   await button.click();
   return name;
 }
+
+const FATIHA_AYAHS = 7;
+
+// Seven equal ayahs spanning the stubbed two-minute clip, so the active ayah at any second is predictable.
+export function fatihaTimings(lastEnd = AUDIO_SECONDS) {
+  const length = lastEnd / FATIHA_AYAHS;
+  return {
+    preamble: null,
+    ayahs: Array.from({ length: FATIHA_AYAHS }, (_, i) => ({ ayah: i + 1, start: i * length, end: (i + 1) * length })),
+  };
+}
+
+export async function mockQuranText(page: Page) {
+  const ayahs = (label: string) => Array.from({ length: FATIHA_AYAHS }, (_, i) => ({ numberInSurah: i + 1, text: `${label} ${i + 1}` }));
+  await page.route("**/api.alquran.cloud/**", (route) =>
+    route.fulfill({ json: { code: 200, status: "OK", data: [{ number: 1, name: "الفاتحة", ayahs: ayahs("آية") }, { number: 1, ayahs: ayahs("অনুবাদ") }] } }),
+  );
+}

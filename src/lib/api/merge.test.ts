@@ -1,5 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { SourceMoshaf, SourceReciter } from "../types";
+vi.mock("./timings", () => ({ isSynced: ({ server }: { server: string }) => server.includes("/synced") }));
+
 import { mergeReciters, nameKey, sameReciter, variantKey } from "./merge";
 
 const ALL = Array.from({ length: 114 }, (_, i) => i + 1);
@@ -61,7 +63,11 @@ describe("mergeReciters", () => {
       ],
     ]);
     expect(merged).toEqual([
-      { id: 1, name: "Mishary Alafasi", moshafs: [{ id: 12, name: "Hafs A'n Assem, Murattal", server: "https://s.example/12/", padded: true, downloadable: true }] },
+      {
+        id: 1,
+        name: "Mishary Alafasi",
+        moshafs: [{ id: 12, name: "Hafs A'n Assem, Murattal", server: "https://s.example/12/", padded: true, downloadable: true, synced: false }],
+      },
     ]);
   });
 
@@ -76,6 +82,31 @@ describe("mergeReciters", () => {
     expect(merged).toHaveLength(1);
     expect(merged[0]).toMatchObject({ id: 51, name: "Abdulbasit Abdulsamad" });
     expect(merged[0]!.moshafs.map((m) => m.id)).toEqual([1, 100001]);
+    expect(merged[0]!.moshafs.every((m) => !m.synced)).toBe(true);
+  });
+
+  it("replaces a recitation that can't follow along with a synced one of the same style", () => {
+    const merged = mergeReciters([
+      [reciter(1, "Mishary Alafasi", [moshaf(11)])],
+      [reciter(100007, "Mishari Rashid al-'Afasy", [moshaf(100007, "Murattal", { server: "https://q.example/synced/" })])],
+    ]);
+    expect(merged[0]!.moshafs).toEqual([expect.objectContaining({ id: 100007, synced: true })]);
+    expect(merged[0]).toMatchObject({ id: 1, name: "Mishary Alafasi" });
+  });
+
+  it("lists synced recitations first so they are the default", () => {
+    const merged = mergeReciters([
+      [reciter(1, "Reciter", [moshaf(11, "Hafs A'n Assem, Murattal"), moshaf(12, "Almusshaf Al Mojawwad", { server: "https://s.example/synced/" })])],
+    ]);
+    expect(merged[0]!.moshafs.map((m) => [m.id, m.synced])).toEqual([[12, true], [11, false]]);
+  });
+
+  it("keeps a synced recitation when a later source offers an unsynced one", () => {
+    const merged = mergeReciters([
+      [reciter(1, "Mishary Alafasi", [moshaf(11, "Hafs A'n Assem, Murattal", { server: "https://s.example/synced/" })])],
+      [reciter(200007, "Mishary Rashid Alafasy", [moshaf(200007, "Murattal", { downloadable: false })])],
+    ]);
+    expect(merged[0]!.moshafs.map((m) => m.id)).toEqual([11]);
   });
 
   it("fills a reciter whose only complete recitation comes from a later source", () => {

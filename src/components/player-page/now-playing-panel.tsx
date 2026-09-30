@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, ListVideoIcon, PlayIcon } from "lucide-react";
+import { BookOpen, ListVideoIcon, PlayIcon, RadioIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { NowPlayingInfo } from "@/components/player/now-playing-info";
 import { RepeatButton } from "@/components/player/repeat-button";
@@ -114,6 +114,7 @@ export function NowPlayingPanel({
                     {source.moshafs.map((m) => (
                       <TabsTrigger key={m.id} value={String(m.id)}>
                         {getLocalizedMoshafName(m.name, locale)}
+                        {m.synced && <RadioIcon className="size-3 text-primary" aria-label={t("playerPage.synced")} />}
                       </TabsTrigger>
                     ))}
                   </TabsList>

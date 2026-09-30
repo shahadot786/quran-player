@@ -1,0 +1,425 @@
+{
+  "mp3quran": [
+    {
+      "read": 1,
+      "folder": "https://server6.mp3quran.net/akdr/"
+    },
+    {
+      "read": 3,
+      "folder": "https://server6.mp3quran.net/3siri/"
+    },
+    {
+      "read": 4,
+      "folder": "https://server11.mp3quran.net/shatri/"
+    },
+    {
+      "read": 5,
+      "folder": "https://server10.mp3quran.net/ajm/"
+    },
+    {
+      "read": 6,
+      "folder": "https://server11.mp3quran.net/hawashi/"
+    },
+    {
+      "read": 8,
+      "folder": "https://server8.mp3quran.net/saber/"
+    },
+    {
+      "read": 9,
+      "folder": "https://server11.mp3quran.net/ahmad_nu/"
+    },
+    {
+      "read": 10,
+      "folder": "https://server9.mp3quran.net/akrm/"
+    },
+    {
+      "read": 12,
+      "folder": "https://server6.mp3quran.net/abkr/"
+    },
+    {
+      "read": 13,
+      "folder": "https://server9.mp3quran.net/alzain/"
+    },
+    {
+      "read": 17,
+      "folder": "https://server6.mp3quran.net/twfeeq/"
+    },
+    {
+      "read": 20,
+      "folder": "https://server10.mp3quran.net/jleel/"
+    },
+    {
+      "read": 21,
+      "folder": "https://server10.mp3quran.net/qht/"
+    },
+    {
+      "read": 22,
+      "folder": "https://server11.mp3quran.net/kafi/"
+    },
+    {
+      "read": 24,
+      "folder": "https://server12.mp3quran.net/tnjy/"
+    },
+    {
+      "read": 25,
+      "folder": "https://server9.mp3quran.net/hamza/"
+    },
+    {
+      "read": 30,
+      "folder": "https://server7.mp3quran.net/s_gmd/"
+    },
+    {
+      "read": 31,
+      "folder": "https://server7.mp3quran.net/shur/"
+    },
+    {
+      "read": 32,
+      "folder": "https://server6.mp3quran.net/shl/"
+    },
+    {
+      "read": 33,
+      "folder": "https://server9.mp3quran.net/zaki/"
+    },
+    {
+      "read": 38,
+      "folder": "https://server12.mp3quran.net/taher/"
+    },
+    {
+      "read": 39,
+      "folder": "https://server12.mp3quran.net/hkm/"
+    },
+    {
+      "read": 40,
+      "folder": "https://server8.mp3quran.net/sahood/"
+    },
+    {
+      "read": 42,
+      "folder": "https://server6.mp3quran.net/habdan/"
+    },
+    {
+      "read": 43,
+      "folder": "https://server6.mp3quran.net/s_bud/"
+    },
+    {
+      "read": 44,
+      "folder": "https://server12.mp3quran.net/salah_hashim_m/"
+    },
+    {
+      "read": 46,
+      "folder": "https://server8.mp3quran.net/bu_khtr/"
+    },
+    {
+      "read": 48,
+      "folder": "https://server8.mp3quran.net/ryan/"
+    },
+    {
+      "read": 49,
+      "folder": "https://server6.mp3quran.net/thubti/"
+    },
+    {
+      "read": 50,
+      "folder": "https://server12.mp3quran.net/bari/"
+    },
+    {
+      "read": 51,
+      "folder": "https://server7.mp3quran.net/basit/Almusshaf-Al-Mojawwad/"
+    },
+    {
+      "read": 53,
+      "folder": "https://server7.mp3quran.net/basit/"
+    },
+    {
+      "read": 54,
+      "folder": "https://server11.mp3quran.net/sds/"
+    },
+    {
+      "read": 55,
+      "folder": "https://server11.mp3quran.net/a_ahmed/"
+    },
+    {
+      "read": 56,
+      "folder": "https://server9.mp3quran.net/zahrani/"
+    },
+    {
+      "read": 58,
+      "folder": "https://server8.mp3quran.net/buajan/"
+    },
+    {
+      "read": 59,
+      "folder": "https://server8.mp3quran.net/mtrod/"
+    },
+    {
+      "read": 60,
+      "folder": "https://server6.mp3quran.net/bsfr/"
+    },
+    {
+      "read": 61,
+      "folder": "https://server12.mp3quran.net/kyat/"
+    },
+    {
+      "read": 62,
+      "folder": "https://server13.mp3quran.net/jhn/"
+    },
+    {
+      "read": 66,
+      "folder": "https://server6.mp3quran.net/mohsin_harthi/"
+    },
+    {
+      "read": 67,
+      "folder": "https://server8.mp3quran.net/qasm/"
+    },
+    {
+      "read": 69,
+      "folder": "https://server12.mp3quran.net/obk/"
+    },
+    {
+      "read": 70,
+      "folder": "https://server6.mp3quran.net/kanakeri/"
+    },
+    {
+      "read": 71,
+      "folder": "https://server8.mp3quran.net/wdod/"
+    },
+    {
+      "read": 72,
+      "folder": "https://server6.mp3quran.net/arkani/"
+    },
+    {
+      "read": 76,
+      "folder": "https://server11.mp3quran.net/a_jbr/"
+    },
+    {
+      "read": 77,
+      "folder": "https://server9.mp3quran.net/hajjaj/"
+    },
+    {
+      "read": 78,
+      "folder": "https://server6.mp3quran.net/hafz/"
+    },
+    {
+      "read": 81,
+      "folder": "https://server8.mp3quran.net/frs_a/"
+    },
+    {
+      "read": 86,
+      "folder": "https://server6.mp3quran.net/qtm/"
+    },
+    {
+      "read": 87,
+      "folder": "https://server9.mp3quran.net/nabil/"
+    },
+    {
+      "read": 88,
+      "folder": "https://server8.mp3quran.net/namh/"
+    },
+    {
+      "read": 89,
+      "folder": "https://server8.mp3quran.net/hani/"
+    },
+    {
+      "read": 92,
+      "folder": "https://server11.mp3quran.net/yasser/"
+    },
+    {
+      "read": 106,
+      "folder": "https://server12.mp3quran.net/tblawi/"
+    },
+    {
+      "read": 109,
+      "folder": "https://server8.mp3quran.net/ayyub/"
+    },
+    {
+      "read": 110,
+      "folder": "https://server12.mp3quran.net/shah/"
+    },
+    {
+      "read": 112,
+      "folder": "https://server10.mp3quran.net/minsh/"
+    },
+    {
+      "read": 115,
+      "folder": "https://server12.mp3quran.net/m_krm/"
+    },
+    {
+      "read": 118,
+      "folder": "https://server13.mp3quran.net/husr/"
+    },
+    {
+      "read": 119,
+      "folder": "https://server13.mp3quran.net/husr/Almusshaf-Al-Mojawwad/"
+    },
+    {
+      "read": 122,
+      "folder": "https://server8.mp3quran.net/bna/Almusshaf-Al-Mojawwad/"
+    },
+    {
+      "read": 123,
+      "folder": "https://server8.mp3quran.net/afs/"
+    },
+    {
+      "read": 133,
+      "folder": "https://server12.mp3quran.net/maher/Almusshaf-Al-Mojawwad/"
+    },
+    {
+      "read": 134,
+      "folder": "https://server16.mp3quran.net/m_sayed/Rewayat-Warsh-A-n-Nafi/"
+    },
+    {
+      "read": 139,
+      "folder": "https://server9.mp3quran.net/zaml/"
+    },
+    {
+      "read": 159,
+      "folder": "https://server11.mp3quran.net/mohna/"
+    },
+    {
+      "read": 181,
+      "folder": "https://server6.mp3quran.net/jaman/"
+    },
+    {
+      "read": 193,
+      "folder": "https://server8.mp3quran.net/noah/"
+    },
+    {
+      "read": 198,
+      "folder": "https://server10.mp3quran.net/rashad/"
+    },
+    {
+      "read": 201,
+      "folder": "https://server10.mp3quran.net/trabulsi/"
+    },
+    {
+      "read": 203,
+      "folder": "https://server10.mp3quran.net/Aamer/"
+    },
+    {
+      "read": 217,
+      "folder": "https://server6.mp3quran.net/balilah/"
+    },
+    {
+      "read": 219,
+      "folder": "https://server6.mp3quran.net/wdee3/"
+    },
+    {
+      "read": 221,
+      "folder": "https://server6.mp3quran.net/kurdi/"
+    },
+    {
+      "read": 225,
+      "folder": "https://server6.mp3quran.net/aloosi/"
+    },
+    {
+      "read": 229,
+      "folder": "https://server8.mp3quran.net/m_qari/"
+    },
+    {
+      "read": 232,
+      "folder": "https://server10.mp3quran.net/ibrahim_dosri/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 236,
+      "folder": "https://server10.mp3quran.net/a_majed/"
+    },
+    {
+      "read": 243,
+      "folder": "https://server14.mp3quran.net/mousa/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 244,
+      "folder": "https://server14.mp3quran.net/khalf/"
+    },
+    {
+      "read": 245,
+      "folder": "https://server14.mp3quran.net/mansor/"
+    },
+    {
+      "read": 250,
+      "folder": "https://server14.mp3quran.net/bukheet/"
+    },
+    {
+      "read": 256,
+      "folder": "https://server16.mp3quran.net/shaheen/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 258,
+      "folder": "https://server16.mp3quran.net/soufi/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 259,
+      "folder": "https://server16.mp3quran.net/nufais/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 265,
+      "folder": "https://server16.mp3quran.net/deban/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 268,
+      "folder": "https://server16.mp3quran.net/peshawa/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 273,
+      "folder": "https://server16.mp3quran.net/h_dukhain/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 282,
+      "folder": "https://server16.mp3quran.net/a_turki/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 288,
+      "folder": "https://server8.mp3quran.net/mustafa/Almusshaf-Al-Mojawwad/"
+    },
+    {
+      "read": 289,
+      "folder": "https://server16.mp3quran.net/a_maasaraawi/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 294,
+      "folder": "https://server16.mp3quran.net/s_hashemi/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 295,
+      "folder": "https://server16.mp3quran.net/kh_mohammadi/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 299,
+      "folder": "https://server16.mp3quran.net/h_saleh/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 300,
+      "folder": "https://server16.mp3quran.net/shamrani/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 303,
+      "folder": "https://server16.mp3quran.net/i_sanankoua/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 305,
+      "folder": "https://server9.mp3quran.net/hthfi/Rewayat-Sho-bah-A-n-Asim/"
+    },
+    {
+      "read": 314,
+      "folder": "https://server16.mp3quran.net/a_alemadi/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 340,
+      "folder": "https://server16.mp3quran.net/M_Burhaji/Rewayat-Hafs-A-n-Assem/"
+    },
+    {
+      "read": 10905,
+      "folder": "https://server16.mp3quran.net/H-Aldaghriri/Rewayat-Hafs-A-n-Assem/"
+    }
+  ],
+  "quranCom": [
+    2,
+    1,
+    3,
+    4,
+    5,
+    12,
+    6,
+    7,
+    9,
+    10,
+    11
+  ]
+}

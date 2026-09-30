@@ -54,6 +54,7 @@ const isTrack: Guard<Track> = (value): value is Track =>
   value.server.startsWith("https://") &&
   isBoolean(value.padded) &&
   (value.downloadable === undefined || isBoolean(value.downloadable)) &&
+  (value.synced === undefined || isBoolean(value.synced)) &&
   isSurah(value.surah);
 
 const isSettings: Guard<SettingsData> = (value): value is SettingsData =>

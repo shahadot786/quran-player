@@ -23,6 +23,7 @@ export function toTrack(reciter: Pick<Reciter, "id" | "name">, moshaf: Moshaf, s
     server: moshaf.server,
     padded: moshaf.padded,
     downloadable: moshaf.downloadable,
+    synced: moshaf.synced,
     surah,
   };
 }

@@ -1,10 +1,12 @@
 "use client";
 
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, RadioIcon } from "lucide-react";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ReciterAvatar } from "@/components/reciter-avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Command, CommandDialog, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { getLocalizedMoshafName, getLocalizedReciterName } from "@/lib/bengali-data";
 import { matchesName } from "@/lib/search";
@@ -17,7 +19,8 @@ export function ReciterPicker({ reciters, selectedId, onSelect }: { reciters: Re
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const selected = reciters.find((r) => r.id === selectedId);
-  const results = reciters.filter((r) => matchesName(r.name, query));
+  const [syncedOnly, setSyncedOnly] = useState(false);
+  const results = reciters.filter((r) => matchesName(r.name, query) && (!syncedOnly || r.moshafs.some((m) => m.synced)));
 
   return (
     <>
@@ -34,6 +37,10 @@ export function ReciterPicker({ reciters, selectedId, onSelect }: { reciters: Re
       <CommandDialog open={open} onOpenChange={setOpen} title={t("chooseReciter")} description={t("chooseReciterDescription")}>
         <Command shouldFilter={false}>
           <CommandInput placeholder={t("searchReciters")} value={query} onValueChange={setQuery} />
+          <label className="flex items-center justify-between gap-3 border-b px-3 py-2 text-sm text-muted-foreground">
+            {t("syncedOnly")}
+            <Switch checked={syncedOnly} onCheckedChange={setSyncedOnly} />
+          </label>
           <CommandList>
             <CommandEmpty>{t("noReciters", { query })}</CommandEmpty>
             {results.map((r) => (
@@ -53,6 +60,12 @@ export function ReciterPicker({ reciters, selectedId, onSelect }: { reciters: Re
                     {r.moshafs.length > 1 ? tr("recitations", { count: r.moshafs.length }) : getLocalizedMoshafName(r.moshafs[0]!.name, locale)}
                   </span>
                 </span>
+                {r.moshafs.some((m) => m.synced) && (
+                  <Badge variant="secondary" className="gap-1">
+                    <RadioIcon className="size-3" />
+                    {t("synced")}
+                  </Badge>
+                )}
                 {r.id === selectedId && <CheckIcon className="text-primary" />}
               </CommandItem>
             ))}

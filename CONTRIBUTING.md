@@ -12,12 +12,12 @@ Thank you for your interest in contributing to Quran Player! We welcome bug repo
    ```bash
    git clone https://github.com/shahadot786/quran-player.git
    cd quran-player
-   npm install
+   yarn install
    ```
 
 3. **Run Development Server**
    ```bash
-   npm run dev
+   yarn dev
    ```
    Open [http://localhost:3000](http://localhost:3000) to view the application.
 
@@ -37,19 +37,19 @@ Please run the following commands locally to verify everything passes before pus
 
 ```bash
 # 1. Linting
-npm run lint
+yarn lint
 
 # 2. TypeScript compilation check
-npm run typecheck
+yarn typecheck
 
 # 3. Unit and component tests
 npm test
 
 # 4. Production build
-npm run build
+yarn build
 
 # 5. Playwright E2E tests
-npm run test:e2e
+yarn test:e2e
 ```
 
 ## Pull Request Guidelines

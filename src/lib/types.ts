@@ -4,6 +4,8 @@ export type Moshaf = {
   server: string;
   padded: boolean;
   downloadable: boolean;
+  /** Ayah-by-ayah timings exist for every surah, so the text can follow the recitation. */
+  synced: boolean;
 };
 
 export type Reciter = {
@@ -12,7 +14,7 @@ export type Reciter = {
   moshafs: Moshaf[];
 };
 
-export type SourceMoshaf = Moshaf & { surahs: number[] };
+export type SourceMoshaf = Omit<Moshaf, "synced"> & { surahs: number[] };
 export type SourceReciter = { id: number; name: string; moshafs: SourceMoshaf[] };
 
 export type ReciterSummary = {
@@ -29,6 +31,7 @@ export type Track = {
   server: string;
   padded: boolean;
   downloadable?: boolean;
+  synced?: boolean;
   surah: number;
 };
 

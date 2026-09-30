@@ -25,12 +25,12 @@ describe("track helpers", () => {
   });
 
   it("maps a moshaf to all 114 surahs in order", () => {
-    const moshaf = { id: 5, name: "Hafs", server: "https://s.example/", padded: true, downloadable: false };
+    const moshaf = { id: 5, name: "Hafs", server: "https://s.example/", padded: true, downloadable: false, synced: true };
     const queue = moshafQueue({ id: 9, name: "Reciter" }, moshaf);
     expect(queue).toHaveLength(114);
     expect(queue.map((t) => t.surah).slice(0, 3)).toEqual([1, 2, 3]);
     expect(queue.at(-1)?.surah).toBe(114);
     expect(queue[0]).toEqual(toTrack({ id: 9, name: "Reciter" }, moshaf, 1));
-    expect(queue[0]).toMatchObject({ reciterId: 9, moshafId: 5, moshafName: "Hafs", server: "https://s.example/", downloadable: false });
+    expect(queue[0]).toMatchObject({ reciterId: 9, moshafId: 5, moshafName: "Hafs", server: "https://s.example/", downloadable: false, synced: true });
   });
 });

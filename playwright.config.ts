@@ -12,7 +12,7 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: `npm run build && npm run start -- -p ${PORT}`,
+    command: `yarn build && yarn start -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     timeout: 300_000,
     reuseExistingServer: !process.env.CI,

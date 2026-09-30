@@ -14,6 +14,7 @@ function fromTrack(track: Track): Source {
     server: track.server,
     padded: track.padded,
     downloadable: track.downloadable !== false,
+    synced: track.synced === true,
   };
   return { reciter: { id: track.reciterId, name: track.reciterName }, moshaf, moshafs: [moshaf] };
 }
