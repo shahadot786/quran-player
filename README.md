@@ -28,10 +28,31 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - Tap **Play from ayah N** on any ayah to jump there.
 - The highlight only follows when real ayah timings exist for that exact recording, so it never guesses. See [How the sync works](#how-the-ayah-sync-works).
 
+### Quran progress
+- **A full picture of your khatm** at `/progress`, with a summary card on the player page: percent of the Quran heard, surahs and paras finished, ayahs heard, time listened, daily average and an estimate of the time left.
+- **A grid of all 30 paras and all 114 surahs.** Tap a surah to see which parts you have heard, how many times you finished it, when you last listened, your most-used reciter and the time spent.
+- **Honest numbers.** A surah counts as finished only when 95% of it was actually heard, so seeking to the end or replaying a part doesn't count. Paras that cut through a surah are labelled "estimated".
+- **Khatm rounds:** finish all 114 and the round is recorded with its date, then a new one starts.
+- If you used an earlier version, your finished surahs, resume points and history are carried over automatically, and your old data is never modified.
+
+### Zikir
+- **A tasbih you can count on** at `/zikir`: a 3D **bead string** (a 33-bead misbaha with a gold marker bead and tassel) or a 3D **dial**, built with Three.js. Tap, press Enter or Space, or swipe, and one bead moves past with a soft click and a light vibration. A plain 2D counter is always available and is used automatically when WebGL isn't available or you prefer reduced motion.
+- **Ready-made zikir and groups:** SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illallah, Astaghfirullah, salawat and more, and groups that move step by step, such as the after-salah 33, 33 and 34.
+- **Your own zikir and groups:** set a count or no limit, add Arabic text, transliteration and meaning, order the steps of a group, and delete anything you don't want. Built-in ones are hidden rather than lost, and "Restore removed zikir" brings them back.
+- Undo, start over, finish a round by hand, optional sound and vibration, and keep-the-screen-on. An unfinished round is waiting for you when you come back.
+
 ### Your library
 - Favorite reciters and surahs, playlists (create, rename, reorder, play all), and listening history.
 - **Stats**: time listened, surahs completed, current and longest streak, top reciters and a 7-day chart.
-- **Backup**: export, import or reset all local data as JSON. There are no accounts and nothing leaves your device.
+- **Backup**: export, import or reset all local data as JSON.
+
+### Cloud sync (optional)
+- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a random key in your browser, eight easy-to-write words like `apple-river-…` (88 bits, so it can't be guessed), and the cloud keeps one copy of your progress, zikir, stats and library under a hash of that key. The key itself is never stored on the server.
+- **Sync now** pulls the cloud copy, merges it with this device (progress heard on either device counts, zikir counted on two devices adds up, deleted zikir stay deleted) and saves the result in both places, so one device never overwrites another.
+- **Restore from key** brings your data to another device or after clearing the browser. **Delete my cloud data** removes the cloud copy and leaves the data on your device alone.
+- Anyone who has your key can read and change your cloud copy, and a lost key can't be recovered, so keep it safe. The JSON backup stays as a second safety net.
+- Known limit: removing a favorite or deleting a playlist on one device doesn't propagate yet; the item can come back on the next sync from another device.
+- Sync is off unless the server has a database configured (see Environment).
 
 ### Offline and installable
 - **Download surahs** for offline listening, seeking included, and install the app on iOS, Android or desktop (PWA).
@@ -66,9 +87,11 @@ About 100 reciters (roughly 100 recitations) can follow along. Reciters marked *
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack) and [React 19](https://react.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
+- **3D**: [Three.js](https://threejs.org/), loaded only on the zikir counter page and only when a 3D view is shown
 - **State**: [Zustand](https://zustand-demo.pmnd.rs/) persisted to localStorage, with IndexedDB and the Cache API for downloads
 - **i18n**: [next-intl](https://next-intl.dev/) with `messages/en.json` and `messages/bn.json`
 - **PWA and offline**: [Serwist](https://serwist.pages.dev/) (`@serwist/turbopack`)
+- **Cloud sync**: route handlers with [Neon](https://neon.tech/) serverless Postgres (`@neondatabase/serverless`), only when `DATABASE_URL` is set
 - **Tests**: [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/)
 
 ## Getting started
@@ -95,6 +118,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Purpose | Default |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, `robots.txt` and OpenGraph tags | `https://tilawah.shahadot.dev` |
+| `DATABASE_URL` | Neon connection string (pooled) for cloud sync. Server only. Without it, sync answers "not available" and everything else works | unset |
+| `CRON_SECRET` | Secret for the weekly cleanup job at `/api/sync/cleanup`. Also used to hash addresses for rate limits. Server only | unset |
+
+Never commit real values: they belong in `.env.local` and in your host's environment settings.
 
 ### Scripts
 
@@ -108,8 +135,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | `yarn surahs` | Regenerate `src/data/surahs.json` |
 | `yarn sources` | Re-check which islamic.network recitations have all 114 files (`src/data/islamic-network.json`) |
 | `yarn timings` | Re-validate ayah timings for every recitation (`src/data/synced-recitations.json`) |
+| `yarn db:migrate` | Create the cloud sync tables in the database named by `DATABASE_URL` (reads `.env.local`; safe to run again) |
+| `yarn juzs` | Re-fetch the 30 para boundaries and check them against the surah data (`src/data/juzs.json`) |
 
-The three data files are committed. Only re-run `sources` and `timings` when you want to pick up upstream changes.
+The data files are committed. Only re-run `sources`, `timings` and `juzs` when you want to pick up upstream changes.
 
 ## Quality checks
 
@@ -129,11 +158,11 @@ The end-to-end tests stub the audio and the timing and text APIs, so they don't 
 
 ```
 src/app/            routes, API routes (/api/reciters, /api/timings), manifest, sitemap, service worker
-src/components/     UI: player, player-page, library, stats, layout, shadcn ui
+src/components/     UI: player, player-page, library, progress, stats, layout, shadcn ui
 src/hooks/          audio engine, media session, ayah sync
-src/lib/            audio URLs, catalog merging, timings, downloads, backup, stats
-src/stores/         persisted Zustand stores (player, library, settings, stats, downloads)
-src/data/           bundled surah metadata, recitation and timing lists
+src/lib/            audio URLs, catalog merging, timings, downloads, backup, stats, progress (src/lib/progress)
+src/stores/         persisted Zustand stores (player, library, settings, stats, progress, downloads)
+src/data/           bundled surah metadata, para boundaries, recitation and timing lists
 messages/           en.json, bn.json
 e2e/                Playwright tests
 scripts/            data refresh scripts
@@ -145,7 +174,8 @@ The app deploys on [Vercel](https://vercel.com):
 
 1. Import the `quran-player` repository.
 2. Optionally set `NEXT_PUBLIC_SITE_URL` (the default is already `https://tilawah.shahadot.dev`). If you set it, use the production domain.
-3. Deploy. The production domain is [tilawah.shahadot.dev](https://tilawah.shahadot.dev).
+3. For cloud sync, create a free Neon project, run `yarn db:migrate` once against it, and set `DATABASE_URL` and `CRON_SECRET` in the Vercel project. `vercel.json` schedules the weekly cleanup of copies untouched for 12 months.
+4. Deploy. The production domain is [tilawah.shahadot.dev](https://tilawah.shahadot.dev).
 
 ## Contributing
 

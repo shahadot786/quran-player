@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 import { getAudio } from "@/lib/audio";
+import { PlaybackRecorder } from "@/lib/progress/recorder";
 import { trackKey } from "@/lib/audio-url";
 import { COMPLETE_RATIO, consumeResume, selectCurrentTrack, usePlayerStore } from "@/stores/player-store";
+import { useProgressStore } from "@/stores/progress-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
 
@@ -28,11 +30,13 @@ export function useAudioEngine(onError: () => void) {
     let pendingSeconds = 0;
     let lastFlush = performance.now();
     let completedKey: string | null = null;
+    const recorder = new PlaybackRecorder((batch) => useProgressStore.getState().applyPlayback(batch));
 
     const flushStats = () => {
       const track = selectCurrentTrack(player.getState());
       if (track && pendingSeconds > 0) useStatsStore.getState().addListening(pendingSeconds, track);
       pendingSeconds = 0;
+      recorder.flush();
       lastFlush = performance.now();
     };
 
@@ -59,9 +63,16 @@ export function useAudioEngine(onError: () => void) {
       if (a !== null && b !== null && (audio.currentTime >= b || audio.currentTime < a)) audio.currentTime = a;
       state.sync({ currentTime: audio.currentTime });
 
+      const track = selectCurrentTrack(state);
+      recorder.setTrack(track);
+      if (!audio.paused) recorder.tick(audio.currentTime, audio.duration, audio.playbackRate);
+
       if (!audio.paused && lastTick !== null) {
         const delta = (now - lastTick) / 1000;
-        if (delta <= MAX_TICK_SECONDS) pendingSeconds += delta;
+        if (delta <= MAX_TICK_SECONDS) {
+          pendingSeconds += delta;
+          recorder.addSeconds(delta);
+        }
       }
       lastTick = audio.paused ? null : now;
       if (now - lastFlush > STATS_FLUSH_MS) flushStats();
@@ -70,7 +81,6 @@ export function useAudioEngine(onError: () => void) {
         lastSave = now;
       }
 
-      const track = selectCurrentTrack(state);
       if (track && audio.duration && audio.currentTime / audio.duration >= COMPLETE_RATIO) {
         const key = trackKey(track);
         if (completedKey !== key) {
@@ -148,6 +158,7 @@ export function useAudioEngine(onError: () => void) {
     if (!audio.src && selectCurrentTrack(player.getState())) player.getState().load(false);
 
     return () => {
+      recorder.flush();
       window.clearInterval(sleepInterval);
       unsubscribeSettings();
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);

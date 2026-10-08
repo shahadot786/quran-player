@@ -52,6 +52,7 @@ export function topReciters(reciters: Record<number, { name: string; seconds: nu
     .slice(0, limit);
 }
 
-export function distinctCompleted(completed: Record<string, { surah: number }>) {
-  return new Set(Object.values(completed).map((entry) => entry.surah)).size;
+export function averageSecondsPerActiveDay(daily: Record<string, number>) {
+  const active = Object.values(daily).filter((seconds) => seconds > 0);
+  return active.length === 0 ? 0 : active.reduce((total, seconds) => total + seconds, 0) / active.length;
 }

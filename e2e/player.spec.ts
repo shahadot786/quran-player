@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { mockAudio, openPlayer, playFirstSurah } from "./helpers";
+import { goToPage, mockAudio, openPlayer, playFirstSurah } from "./helpers";
 
 test("plays, seeks and resumes after a reload", async ({ page, isMobile }) => {
   await mockAudio(page);
@@ -28,12 +28,12 @@ test("plays, seeks and resumes after a reload", async ({ page, isMobile }) => {
   await expect(page.getByRole("link", { name: surah, exact: true })).toBeVisible();
 });
 
-test("keeps playing while navigating between pages", async ({ page }) => {
+test("keeps playing while navigating between pages", async ({ page, isMobile }) => {
   await mockAudio(page);
   await page.goto("/reciters/123");
   await playFirstSurah(page);
   await expect(page.getByRole("button", { name: "Pause", exact: true }).first()).toBeVisible();
-  await page.getByRole("link", { name: "Surahs", exact: true }).click();
+  await goToPage(page, isMobile, "Surahs");
   await expect(page).toHaveURL(/\/surahs$/);
   await expect(page.getByRole("button", { name: "Pause", exact: true }).first()).toBeVisible();
 });

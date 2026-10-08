@@ -52,6 +52,19 @@ export async function playFirstSurah(page: Page) {
   return name;
 }
 
+// On phones the bottom bar keeps four pages and puts the rest behind More; the sidebar lists everything.
+export async function goToPage(page: Page, isMobile: boolean, name: string) {
+  const link = page.getByRole("link", { name, exact: true });
+  if (isMobile && !(await link.isVisible())) {
+    await page.getByRole("button", { name: "More", exact: true }).click();
+    const sheet = page.getByRole("dialog");
+    await sheet.getByRole("link", { name, exact: true }).click();
+    await expect(sheet).toBeHidden();
+    return;
+  }
+  await link.click();
+}
+
 const FATIHA_AYAHS = 7;
 
 // Seven equal ayahs spanning the stubbed two-minute clip, so the active ayah at any second is predictable.
