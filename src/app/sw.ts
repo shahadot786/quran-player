@@ -2,7 +2,7 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/turbopack/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { CacheFirst, ExpirationPlugin, Serwist, createPartialResponse } from "serwist";
+import { CacheFirst, ExpirationPlugin, NetworkOnly, Serwist, createPartialResponse } from "serwist";
 import { AUDIO_CACHE } from "@/lib/cache-names";
 
 declare global {
@@ -19,6 +19,11 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
+    // The default API cache is keyed by URL alone, so it would hand one person's cloud copy to another key when offline.
+    {
+      matcher: ({ url }) => url.pathname.startsWith("/api/sync"),
+      handler: new NetworkOnly(),
+    },
     {
       matcher: ({ url }) => url.pathname === "/api/timings",
       handler: new CacheFirst({ cacheName: "qp-timings", plugins: [new ExpirationPlugin({ maxEntries: 300 })] }),

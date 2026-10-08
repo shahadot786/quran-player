@@ -657,5 +657,53 @@
       "clearDescription": "This removes the list of finished rounds from this device. Your daily counts stay.",
       "cleared": "History cleared"
     }
+  },
+  "sync": {
+    "title": "Cloud sync",
+    "description": "Keep a copy of your listening progress, zikir and stats in the cloud, and bring it to another device. There is no account: a key on this device identifies your copy, and nothing is uploaded until you press Sync.",
+    "syncNow": "Sync now",
+    "syncing": "Syncing…",
+    "synced": "Synced",
+    "lastSynced": "Last synced {time}",
+    "neverSynced": "Not synced yet",
+    "cancel": "Cancel",
+    "privacy": "Only a hash of your key is stored, together with your data. No name, email or IP address is saved with it.",
+    "key": {
+      "label": "Your sync key",
+      "show": "Show key",
+      "hide": "Hide key",
+      "copy": "Copy key",
+      "copied": "Key copied",
+      "copyError": "Couldn’t copy the key.",
+      "warning": "Anyone with these words can read and change your cloud copy. If you lose both the key and this browser’s data, the cloud copy can’t be recovered, so write the words down or keep them somewhere safe."
+    },
+    "restore": {
+      "open": "Restore from key",
+      "title": "Restore from a key",
+      "description": "Type or paste the sync key from another device: eight words. Its cloud data is merged with the data on this device, and this device uses that key from now on.",
+      "label": "Sync key",
+      "confirm": "Restore",
+      "restoring": "Restoring…",
+      "done": "Restored from key"
+    },
+    "delete": {
+      "open": "Delete my cloud data",
+      "title": "Delete your cloud data?",
+      "description": "The copy in the cloud is erased. The data on this device is kept, and the next sync uploads it again.",
+      "confirm": "Delete",
+      "done": "Cloud data deleted"
+    },
+    "errors": {
+      "offline": "You’re offline. Your data on this device is safe; try again when you’re connected.",
+      "invalid-key": "That isn’t a valid sync key. A key is eight words, like “apple-river-…”, and every word must be spelled correctly.",
+      "rate-limited": "Too many requests. Try again in a few minutes.",
+      "too-large": "Your data is too large to sync.",
+      "rejected": "The cloud couldn’t accept this data.",
+      "not-configured": "Cloud sync isn’t available right now.",
+      "not-found": "There is no cloud data for that key.",
+      "conflict": "The cloud copy kept changing. Try again.",
+      "server": "Something went wrong while syncing. Try again."
+    },
+    "link": "Back up and sync"
   }
 }

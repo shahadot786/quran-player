@@ -44,7 +44,15 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 ### Your library
 - Favorite reciters and surahs, playlists (create, rename, reorder, play all), and listening history.
 - **Stats**: time listened, surahs completed, current and longest streak, top reciters and a 7-day chart.
-- **Backup**: export, import or reset all local data as JSON. There are no accounts and nothing leaves your device.
+- **Backup**: export, import or reset all local data as JSON.
+
+### Cloud sync (optional)
+- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a random key in your browser, eight easy-to-write words like `apple-river-…` (88 bits, so it can't be guessed), and the cloud keeps one copy of your progress, zikir, stats and library under a hash of that key. The key itself is never stored on the server.
+- **Sync now** pulls the cloud copy, merges it with this device (progress heard on either device counts, zikir counted on two devices adds up, deleted zikir stay deleted) and saves the result in both places, so one device never overwrites another.
+- **Restore from key** brings your data to another device or after clearing the browser. **Delete my cloud data** removes the cloud copy and leaves the data on your device alone.
+- Anyone who has your key can read and change your cloud copy, and a lost key can't be recovered, so keep it safe. The JSON backup stays as a second safety net.
+- Known limit: removing a favorite or deleting a playlist on one device doesn't propagate yet; the item can come back on the next sync from another device.
+- Sync is off unless the server has a database configured (see Environment).
 
 ### Offline and installable
 - **Download surahs** for offline listening, seeking included, and install the app on iOS, Android or desktop (PWA).
@@ -83,6 +91,7 @@ About 100 reciters (roughly 100 recitations) can follow along. Reciters marked *
 - **State**: [Zustand](https://zustand-demo.pmnd.rs/) persisted to localStorage, with IndexedDB and the Cache API for downloads
 - **i18n**: [next-intl](https://next-intl.dev/) with `messages/en.json` and `messages/bn.json`
 - **PWA and offline**: [Serwist](https://serwist.pages.dev/) (`@serwist/turbopack`)
+- **Cloud sync**: route handlers with [Neon](https://neon.tech/) serverless Postgres (`@neondatabase/serverless`), only when `DATABASE_URL` is set
 - **Tests**: [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/)
 
 ## Getting started
@@ -109,6 +118,10 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Purpose | Default |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, `robots.txt` and OpenGraph tags | `https://tilawah.shahadot.dev` |
+| `DATABASE_URL` | Neon connection string (pooled) for cloud sync. Server only. Without it, sync answers "not available" and everything else works | unset |
+| `CRON_SECRET` | Secret for the weekly cleanup job at `/api/sync/cleanup`. Also used to hash addresses for rate limits. Server only | unset |
+
+Never commit real values: they belong in `.env.local` and in your host's environment settings.
 
 ### Scripts
 
@@ -122,6 +135,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `yarn surahs` | Regenerate `src/data/surahs.json` |
 | `yarn sources` | Re-check which islamic.network recitations have all 114 files (`src/data/islamic-network.json`) |
 | `yarn timings` | Re-validate ayah timings for every recitation (`src/data/synced-recitations.json`) |
+| `yarn db:migrate` | Create the cloud sync tables in the database named by `DATABASE_URL` (reads `.env.local`; safe to run again) |
 | `yarn juzs` | Re-fetch the 30 para boundaries and check them against the surah data (`src/data/juzs.json`) |
 
 The data files are committed. Only re-run `sources`, `timings` and `juzs` when you want to pick up upstream changes.
@@ -160,7 +174,8 @@ The app deploys on [Vercel](https://vercel.com):
 
 1. Import the `quran-player` repository.
 2. Optionally set `NEXT_PUBLIC_SITE_URL` (the default is already `https://tilawah.shahadot.dev`). If you set it, use the production domain.
-3. Deploy. The production domain is [tilawah.shahadot.dev](https://tilawah.shahadot.dev).
+3. For cloud sync, create a free Neon project, run `yarn db:migrate` once against it, and set `DATABASE_URL` and `CRON_SECRET` in the Vercel project. `vercel.json` schedules the weekly cleanup of copies untouched for 12 months.
+4. Deploy. The production domain is [tilawah.shahadot.dev](https://tilawah.shahadot.dev).
 
 ## Contributing
 

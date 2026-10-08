@@ -39,8 +39,8 @@ type ZikirState = ZikirData & {
   deleteGroup: (id: string, now?: number) => void;
   restoreBuiltIns: (now?: number) => void;
   clearHistory: () => void;
-  /** Replaces the saved data with a snapshot. Rounds in progress and the view, sound and vibration choices belong to this device and stay out of it. */
-  restore: (snapshot: ZikirSnapshot) => void;
+  /** Replaces the saved data with a snapshot. Rounds in progress and the view, sound and vibration choices belong to this device and stay out of it; rounds are dropped unless `keepRuns` is set, as a sync does. */
+  restore: (snapshot: ZikirSnapshot, options?: { keepRuns?: boolean }) => void;
   tap: (ref: RunRef, now?: number) => TapResult | null;
   undo: (ref: RunRef, now?: number) => boolean;
   resetRun: (ref: RunRef) => void;
@@ -221,7 +221,7 @@ export const useZikirStore = create<ZikirState>()(
 
       clearHistory: () => set({ history: [] }),
 
-      restore: (snapshot) => set({ ...snapshot, runs: {} }),
+      restore: (snapshot, options) => set(options?.keepRuns ? { ...snapshot } : { ...snapshot, runs: {} }),
 
       setSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
 

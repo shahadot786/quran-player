@@ -3,6 +3,7 @@ import { usePlayerStore } from "@/stores/player-store";
 import { useProgressStore } from "@/stores/progress-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { useSyncStore } from "@/stores/sync-store";
 import { useZikirStore } from "@/stores/zikir-store";
 
 export function resetStores() {
@@ -12,4 +13,5 @@ export function resetStores() {
   useStatsStore.setState(useStatsStore.getInitialState(), true);
   useProgressStore.setState(useProgressStore.getInitialState(), true);
   useZikirStore.setState(useZikirStore.getInitialState(), true);
+  useSyncStore.setState(useSyncStore.getInitialState(), true);
 }

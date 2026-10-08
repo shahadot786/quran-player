@@ -11,6 +11,7 @@ import { computeStreaks, lastDays, topReciters } from "@/lib/stats";
 import { useHydrated } from "@/stores/hydration";
 import { useProgressStore } from "@/stores/progress-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { SyncCard } from "@/components/sync/sync-card";
 import { DataPanel } from "./data-panel";
 import { WeekChart } from "./week-chart";
 
@@ -98,6 +99,7 @@ export function StatsView() {
       </div>
 
       <DataPanel />
+      <SyncCard />
     </div>
   );
 }

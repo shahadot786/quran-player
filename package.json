@@ -15,9 +15,12 @@
     "surahs": "node scripts/fetch-surahs.mts",
     "sources": "node scripts/fetch-reciter-sources.mts",
     "timings": "node scripts/fetch-timing-support.mts",
-    "juzs": "node scripts/fetch-juzs.mts"
+    "juzs": "node scripts/fetch-juzs.mts",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "@scure/bip39": "^2.4.0",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.4.0",

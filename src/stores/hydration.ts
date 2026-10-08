@@ -7,9 +7,10 @@ import { usePlayerStore } from "./player-store";
 import { useProgressStore } from "./progress-store";
 import { useSettingsStore } from "./settings-store";
 import { useStatsStore } from "./stats-store";
+import { useSyncStore } from "./sync-store";
 import { useZikirStore } from "./zikir-store";
 
-export const PERSISTED_STORES = [useSettingsStore, usePlayerStore, useLibraryStore, useStatsStore, useProgressStore, useZikirStore] as const;
+export const PERSISTED_STORES = [useSettingsStore, usePlayerStore, useLibraryStore, useStatsStore, useProgressStore, useZikirStore, useSyncStore] as const;
 
 export const useHydrated = create<boolean>(() => false);
 
@@ -27,6 +28,7 @@ export function useRehydrateStores() {
   useEffect(() => {
     Promise.all(PERSISTED_STORES.map((store) => store.persist.rehydrate())).then(() => {
       importLegacyProgress();
+      useSyncStore.getState().ensureKey();
       useHydrated.setState(true);
     });
   }, []);
