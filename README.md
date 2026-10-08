@@ -28,6 +28,13 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - Tap **Play from ayah N** on any ayah to jump there.
 - The highlight only follows when real ayah timings exist for that exact recording, so it never guesses. See [How the sync works](#how-the-ayah-sync-works).
 
+### Quran progress
+- **A full picture of your khatm** at `/progress`, with a summary card on the player page: percent of the Quran heard, surahs and paras finished, ayahs heard, time listened, daily average and an estimate of the time left.
+- **A grid of all 30 paras and all 114 surahs.** Tap a surah to see which parts you have heard, how many times you finished it, when you last listened, your most-used reciter and the time spent.
+- **Honest numbers.** A surah counts as finished only when 95% of it was actually heard, so seeking to the end or replaying a part doesn't count. Paras that cut through a surah are labelled "estimated".
+- **Khatm rounds:** finish all 114 and the round is recorded with its date, then a new one starts.
+- If you used an earlier version, your finished surahs, resume points and history are carried over automatically, and your old data is never modified.
+
 ### Your library
 - Favorite reciters and surahs, playlists (create, rename, reorder, play all), and listening history.
 - **Stats**: time listened, surahs completed, current and longest streak, top reciters and a 7-day chart.
@@ -108,8 +115,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `yarn surahs` | Regenerate `src/data/surahs.json` |
 | `yarn sources` | Re-check which islamic.network recitations have all 114 files (`src/data/islamic-network.json`) |
 | `yarn timings` | Re-validate ayah timings for every recitation (`src/data/synced-recitations.json`) |
+| `yarn juzs` | Re-fetch the 30 para boundaries and check them against the surah data (`src/data/juzs.json`) |
 
-The three data files are committed. Only re-run `sources` and `timings` when you want to pick up upstream changes.
+The data files are committed. Only re-run `sources`, `timings` and `juzs` when you want to pick up upstream changes.
 
 ## Quality checks
 
@@ -129,11 +137,11 @@ The end-to-end tests stub the audio and the timing and text APIs, so they don't 
 
 ```
 src/app/            routes, API routes (/api/reciters, /api/timings), manifest, sitemap, service worker
-src/components/     UI: player, player-page, library, stats, layout, shadcn ui
+src/components/     UI: player, player-page, library, progress, stats, layout, shadcn ui
 src/hooks/          audio engine, media session, ayah sync
-src/lib/            audio URLs, catalog merging, timings, downloads, backup, stats
-src/stores/         persisted Zustand stores (player, library, settings, stats, downloads)
-src/data/           bundled surah metadata, recitation and timing lists
+src/lib/            audio URLs, catalog merging, timings, downloads, backup, stats, progress (src/lib/progress)
+src/stores/         persisted Zustand stores (player, library, settings, stats, progress, downloads)
+src/data/           bundled surah metadata, para boundaries, recitation and timing lists
 messages/           en.json, bn.json
 e2e/                Playwright tests
 scripts/            data refresh scripts

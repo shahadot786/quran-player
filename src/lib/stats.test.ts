@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { localDateKey } from "./format";
-import { computeStreaks, distinctCompleted, lastDays, STREAK_MIN_SECONDS, topReciters } from "./stats";
+import { averageSecondsPerActiveDay, computeStreaks, lastDays, STREAK_MIN_SECONDS, topReciters } from "./stats";
 
 const TODAY = new Date(2026, 8, 30, 15, 0);
 
@@ -69,8 +69,13 @@ describe("topReciters", () => {
   });
 });
 
-describe("distinctCompleted", () => {
-  it("counts each surah once across reciters", () => {
-    expect(distinctCompleted({ "1:1": { surah: 1 }, "2:1": { surah: 1 }, "1:2": { surah: 2 } })).toBe(2);
+describe("averageSecondsPerActiveDay", () => {
+  it("averages over days with listening only", () => {
+    expect(averageSecondsPerActiveDay({ a: 1200, b: 0, c: 600 })).toBe(900);
+  });
+
+  it("is zero with no listening", () => {
+    expect(averageSecondsPerActiveDay({})).toBe(0);
+    expect(averageSecondsPerActiveDay({ a: 0 })).toBe(0);
   });
 });

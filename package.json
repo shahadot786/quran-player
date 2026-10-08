@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "surahs": "node scripts/fetch-surahs.mts",
     "sources": "node scripts/fetch-reciter-sources.mts",
-    "timings": "node scripts/fetch-timing-support.mts"
+    "timings": "node scripts/fetch-timing-support.mts",
+    "juzs": "node scripts/fetch-juzs.mts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

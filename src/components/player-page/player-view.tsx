@@ -11,6 +11,7 @@ import { useHydrated } from "@/stores/hydration";
 import { selectCurrentTrack, usePlayerStore } from "@/stores/player-store";
 import { LiveQuranPanel } from "./live-quran-panel";
 import { NowPlayingPanel } from "./now-playing-panel";
+import { ProgressCard } from "./progress-card";
 import { QueuePanel } from "./queue-panel";
 import { SurahPicker } from "./surah-picker";
 import { usePlayerSource } from "./use-player-source";
@@ -53,13 +54,14 @@ export function PlayerView({ reciters, defaultReciterId }: { reciters: Reciter[]
             <span>{t("playerPage.sidebar.expand")}</span>
           </Button>
         </div>
-        <div className="w-full">
+        <div className="flex w-full flex-col gap-6">
           <NowPlayingPanel
             reciters={reciters}
             source={source}
             onChoose={choose}
             onViewLiveQuran={handleOpenLiveQuran}
           />
+          <ProgressCard />
         </div>
       </div>
     );
@@ -67,13 +69,14 @@ export function PlayerView({ reciters, defaultReciterId }: { reciters: Reciter[]
 
   return (
     <div className="relative grid gap-6 lg:grid-cols-5 lg:items-start">
-      <div className="lg:col-span-3">
+      <div className="flex flex-col gap-6 lg:col-span-3">
         <NowPlayingPanel
           reciters={reciters}
           source={source}
           onChoose={choose}
           onViewLiveQuran={handleOpenLiveQuran}
         />
+        <ProgressCard />
       </div>
       <div className="flex flex-col rounded-2xl border bg-card p-3 sm:p-4 shadow-sm lg:col-span-2">
         <Tabs value={tab} onValueChange={setTab} className="w-full">

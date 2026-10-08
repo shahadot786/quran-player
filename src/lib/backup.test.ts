@@ -4,18 +4,14 @@ import { makeTrack } from "@/test/fixtures";
 
 vi.mock("@/lib/audio", () => ({ getAudio: () => createFakeAudio() }));
 
+import { decodeSlices, emptySlices, encodeSlices, fullSlices, isFinished, markRange } from "@/lib/progress/slices";
 import { useLibraryStore } from "@/stores/library-store";
 import { usePlayerStore } from "@/stores/player-store";
+import { useProgressStore } from "@/stores/progress-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { resetStores } from "@/test/reset-stores";
 import { createBackup, importBackupFile, InvalidBackupError, parseBackup, resetAllData, restoreBackup } from "./backup";
-
-function resetStores() {
-  useSettingsStore.setState(useSettingsStore.getInitialState(), true);
-  usePlayerStore.setState(usePlayerStore.getInitialState(), true);
-  useLibraryStore.setState(useLibraryStore.getInitialState(), true);
-  useStatsStore.setState(useStatsStore.getInitialState(), true);
-}
 
 function seedStores() {
   const track = makeTrack({ surah: 18 });
@@ -27,6 +23,10 @@ function seedStores() {
   useLibraryStore.getState().addHistory(track, 1000);
   useStatsStore.getState().addListening(600, track, new Date(2026, 8, 30));
   useStatsStore.getState().markCompleted(track, 2000);
+  useProgressStore.getState().applyPlayback(
+    { surah: 18, reciter: { id: 1, name: "Mishary Alafasy" }, slices: markRange(emptySlices(), 0, 0.4), seconds: 240, duration: 900 },
+    3000,
+  );
 }
 
 beforeEach(resetStores);
@@ -120,5 +120,79 @@ describe("resetAllData", () => {
     expect(useLibraryStore.getState()).toMatchObject({ favoriteReciters: [], favoriteSurahs: [], playlists: [], history: [] });
     expect(useStatsStore.getState()).toMatchObject({ totalSeconds: 0, daily: {}, completed: {} });
     expect(useSettingsStore.getState().rate).toBe(1.25);
+  });
+});
+
+describe("progress in backups", () => {
+  it("exports progress and restores it exactly, without importing earlier listening a second time", () => {
+    seedStores();
+    useProgressStore.getState().applyPlayback(
+      { surah: 112, reciter: { id: 1, name: "Mishary Alafasy" }, slices: fullSlices(), seconds: 60, duration: 100 },
+      4000,
+    );
+    const before = useProgressStore.getState();
+    const json = JSON.stringify(createBackup(new Date("2026-10-08T10:00:00Z")));
+    resetStores();
+
+    restoreBackup(parseBackup(json));
+
+    const after = useProgressStore.getState();
+    expect(after.slices).toEqual(before.slices);
+    expect(after.lifetime).toEqual(before.lifetime);
+    expect(after.paceSeconds).toBe(before.paceSeconds);
+    expect(isFinished(decodeSlices(after.slices[112]!)!)).toBe(true);
+    expect(after.lifetime[112]!.completions).toBe(1);
+    expect(after.legacyImportedAt).not.toBeNull();
+  });
+
+  it("rebuilds progress from an older backup that has none", () => {
+    seedStores();
+    const older = JSON.parse(JSON.stringify(createBackup()));
+    delete older.data.progress;
+    resetStores();
+
+    restoreBackup(parseBackup(JSON.stringify(older)));
+
+    const { slices, lifetime, legacyImportedAt } = useProgressStore.getState();
+    expect(isFinished(decodeSlices(slices[18]!)!)).toBe(true);
+    expect(lifetime[18]).toMatchObject({ completions: 1, source: "finished" });
+    expect(legacyImportedAt).not.toBeNull();
+  });
+
+  it("replaces progress already on the device instead of mixing the two", () => {
+    seedStores();
+    const json = JSON.stringify(createBackup());
+    useProgressStore.getState().applyPlayback(
+      { surah: 55, reciter: { id: 2, name: "Other" }, slices: fullSlices(), seconds: 10, duration: 100 },
+      9000,
+    );
+    restoreBackup(parseBackup(json));
+    expect(useProgressStore.getState().slices[55]).toBeUndefined();
+  });
+
+  type Damage = (progress: {
+    slices: Record<string, string>;
+    lifetime: Record<string, { seconds: number }>;
+    rounds: unknown[];
+    currentRound: number;
+  }) => void;
+
+  it.each<[string, Damage]>([
+    ["a surah outside 1 to 114", (p) => void (p.slices["200"] = encodeSlices(fullSlices()))],
+    ["damaged slice data", (p) => void (p.slices["18"] = "not-slices")],
+    ["a negative time", (p) => void (p.lifetime["18"]!.seconds = -5)],
+    ["a missing round field", (p) => void (p.rounds = [{ number: 1 }])],
+    ["a round counter below one", (p) => void (p.currentRound = 0)],
+  ])("rejects a backup whose progress has %s", (_name, damage) => {
+    seedStores();
+    const backup = JSON.parse(JSON.stringify(createBackup()));
+    damage(backup.data.progress);
+    expect(() => parseBackup(JSON.stringify(backup))).toThrow(InvalidBackupError);
+  });
+
+  it("clears progress with everything else on reset", () => {
+    seedStores();
+    resetAllData();
+    expect(useProgressStore.getState()).toMatchObject({ slices: {}, lifetime: {}, rounds: [], currentRound: 1 });
   });
 });

@@ -8,11 +8,15 @@
     "label": "Main navigation",
     "home": "Home",
     "player": "Player",
+    "progress": "Progress",
     "reciters": "Reciters",
     "surahs": "Surahs",
     "library": "Library",
     "stats": "Stats",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "more": "More",
+    "moreTitle": "More",
+    "moreDescription": "Other places in the app"
   },
   "theme": {
     "toggle": "Change theme",
@@ -335,5 +339,93 @@
     },
     "synced": "Synced",
     "syncedOnly": "Synced recitations only"
+  },
+  "progress": {
+    "title": "Quran progress",
+    "subtitle": "How far you are through the whole Quran, from what you have listened to on this device.",
+    "empty": "Start listening and your progress will build up here, surah by surah.",
+    "openPlayer": "Open the player",
+    "overview": {
+      "label": "Overview",
+      "heard": "of the Quran heard",
+      "surahs": "Surahs finished",
+      "surahsValue": "{done} of 114",
+      "thisRound": "This round",
+      "paras": "Paras finished",
+      "parasValue": "{done} of 30",
+      "ayahs": "Ayahs heard",
+      "ayahsValue": "{heard} of {total}",
+      "time": "Time listened",
+      "average": "Daily average",
+      "averageHint": "On the days you listen",
+      "timeLeft": "Estimated time left",
+      "timeLeftHint": "At normal speed, from your own pace",
+      "timeLeftNone": "Needs about 10 minutes of new listening to estimate",
+      "round": "Khatm",
+      "roundValue": "Round {number}",
+      "roundHint": "{count, plural, =0 {None completed yet} other {# completed}}"
+    },
+    "tabs": {
+      "paras": "Paras",
+      "surahs": "Surahs",
+      "khatm": "Khatm history"
+    },
+    "paras": {
+      "title": "Paras",
+      "para": "Para {number}",
+      "heard": "{percent} heard",
+      "finished": "Finished",
+      "estimated": "Estimated",
+      "estimatedHint": "This para starts or ends inside a surah, so its share is worked out from the part of that surah you have heard."
+    },
+    "surahs": {
+      "title": "Surahs",
+      "filter": "Filter surahs",
+      "filters": {
+        "all": "All",
+        "inProgress": "In progress",
+        "finished": "Finished",
+        "notStarted": "Not started"
+      },
+      "cell": "Surah {number}, {name}, {status}",
+      "cellHeard": "Surah {number}, {name}, {percent} heard",
+      "none": "No surahs match this filter."
+    },
+    "states": {
+      "notStarted": "Not started",
+      "inProgress": "In progress",
+      "finished": "Finished"
+    },
+    "detail": {
+      "heard": "Heard",
+      "completions": "Times finished",
+      "lastListened": "Last listened",
+      "never": "Not yet",
+      "timeSpent": "Time spent",
+      "reciter": "Most listened reciter",
+      "notTracked": "Not tracked yet",
+      "earlier": "Counted from your earlier listening, up to where you stopped.",
+      "strip": "Which parts you have heard",
+      "stripDescription": "Each bar is a slice of the recitation. Filled bars are heard.",
+      "paras": "Para {paras}",
+      "play": "Play with {reciter}",
+      "choose": "Choose a reciter"
+    },
+    "khatm": {
+      "title": "Khatm history",
+      "empty": "Finish all 114 surahs and your first khatm will appear here.",
+      "number": "Khatm {number}",
+      "finished": "Finished {date}",
+      "took": "{days, plural, one {# day} other {# days}}",
+      "listened": "{duration} of listening",
+      "unknownListening": "Listening time not recorded"
+    },
+    "card": {
+      "title": "Quran progress",
+      "summary": "{paras} of 30 paras · {surahs} of 114 surahs",
+      "view": "View full progress",
+      "empty": "Start a surah and your progress will show here.",
+      "strip": "Progress across the 114 surahs"
+    }
   }
 }

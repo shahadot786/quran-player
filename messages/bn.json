@@ -8,11 +8,15 @@
     "label": "মূল মেনু",
     "home": "হোম",
     "player": "প্লেয়ার",
+    "progress": "অগ্রগতি",
     "reciters": "ক্বারীগণ",
     "surahs": "সূরা",
     "library": "লাইব্রেরি",
     "stats": "পরিসংখ্যান",
-    "skipToContent": "মূল অংশে যান"
+    "skipToContent": "মূল অংশে যান",
+    "more": "আরও",
+    "moreTitle": "আরও",
+    "moreDescription": "অ্যাপের অন্যান্য জায়গা"
   },
   "theme": {
     "toggle": "থিম পরিবর্তন",
@@ -335,5 +339,93 @@
     },
     "synced": "সিঙ্ক",
     "syncedOnly": "শুধু সিঙ্ক করা তিলাওয়াত"
+  },
+  "progress": {
+    "title": "কুরআন অগ্রগতি",
+    "subtitle": "এই ডিভাইসে আপনি যা শুনেছেন, তার ভিত্তিতে পুরো কুরআনের কতটা শেষ হয়েছে।",
+    "empty": "শোনা শুরু করুন, এখানে সূরা ধরে ধরে আপনার অগ্রগতি জমতে থাকবে।",
+    "openPlayer": "প্লেয়ার খুলুন",
+    "overview": {
+      "label": "সারসংক্ষেপ",
+      "heard": "কুরআন শোনা হয়েছে",
+      "surahs": "শেষ হওয়া সূরা",
+      "surahsValue": "{done} / ১১৪",
+      "thisRound": "এই খতমে",
+      "paras": "শেষ হওয়া পারা",
+      "parasValue": "{done} / ৩০",
+      "ayahs": "শোনা আয়াত",
+      "ayahsValue": "{heard} / {total}",
+      "time": "শোনার সময়",
+      "average": "দৈনিক গড়",
+      "averageHint": "যেসব দিন আপনি শোনেন",
+      "timeLeft": "আনুমানিক বাকি সময়",
+      "timeLeftHint": "স্বাভাবিক গতিতে, আপনার নিজের গতি থেকে",
+      "timeLeftNone": "অনুমানের জন্য প্রায় ১০ মিনিট নতুন শোনা দরকার",
+      "round": "খতম",
+      "roundValue": "{number} নম্বর খতম",
+      "roundHint": "{count, plural, =0 {এখনও কোনোটি সম্পন্ন হয়নি} other {# টি সম্পন্ন}}"
+    },
+    "tabs": {
+      "paras": "পারা",
+      "surahs": "সূরা",
+      "khatm": "খতমের ইতিহাস"
+    },
+    "paras": {
+      "title": "পারা",
+      "para": "পারা {number}",
+      "heard": "{percent} শোনা হয়েছে",
+      "finished": "শেষ",
+      "estimated": "আনুমানিক",
+      "estimatedHint": "এই পারা কোনো সূরার মাঝখানে শুরু বা শেষ হয়েছে, তাই ওই সূরার যতটা শুনেছেন তার ভিত্তিতে হিসাব করা হয়েছে।"
+    },
+    "surahs": {
+      "title": "সূরা",
+      "filter": "সূরা ছাঁকুন",
+      "filters": {
+        "all": "সব",
+        "inProgress": "চলছে",
+        "finished": "শেষ",
+        "notStarted": "শুরু হয়নি"
+      },
+      "cell": "সূরা {number}, {name}, {status}",
+      "cellHeard": "সূরা {number}, {name}, {percent} শোনা হয়েছে",
+      "none": "এই ছাঁকনিতে কোনো সূরা মেলেনি।"
+    },
+    "states": {
+      "notStarted": "শুরু হয়নি",
+      "inProgress": "চলছে",
+      "finished": "শেষ"
+    },
+    "detail": {
+      "heard": "শোনা হয়েছে",
+      "completions": "শেষ করার সংখ্যা",
+      "lastListened": "শেষবার শুনেছেন",
+      "never": "এখনও না",
+      "timeSpent": "ব্যয়িত সময়",
+      "reciter": "সবচেয়ে বেশি শোনা ক্বারী",
+      "notTracked": "এখনও হিসাব হয়নি",
+      "earlier": "আপনার আগের শোনা থেকে ধরা হয়েছে, যতদূর থেমেছিলেন ততটুকু।",
+      "strip": "কোন অংশ শুনেছেন",
+      "stripDescription": "প্রতিটি দাগ তিলাওয়াতের একটি টুকরো। ভরা দাগ মানে শোনা হয়েছে।",
+      "paras": "পারা {paras}",
+      "play": "{reciter}-এর তিলাওয়াতে শুনুন",
+      "choose": "ক্বারী বেছে নিন"
+    },
+    "khatm": {
+      "title": "খতমের ইতিহাস",
+      "empty": "১১৪টি সূরা শেষ করলে আপনার প্রথম খতম এখানে দেখা যাবে।",
+      "number": "{number} নম্বর খতম",
+      "finished": "{date} তারিখে শেষ",
+      "took": "{days, plural, one {# দিন} other {# দিন}}",
+      "listened": "{duration} শোনা হয়েছে",
+      "unknownListening": "শোনার সময় রেকর্ড করা নেই"
+    },
+    "card": {
+      "title": "কুরআন অগ্রগতি",
+      "summary": "{paras} / ৩০ পারা · {surahs} / ১১৪ সূরা",
+      "view": "পূর্ণ অগ্রগতি দেখুন",
+      "empty": "একটি সূরা শুরু করুন, এখানে আপনার অগ্রগতি দেখা যাবে।",
+      "strip": "১১৪টি সূরা জুড়ে অগ্রগতি"
+    }
   }
 }

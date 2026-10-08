@@ -29,6 +29,7 @@ Thank you for your interest in contributing! Bug reports, feature suggestions, d
 - **Tailwind CSS**: use the standard scale. Avoid arbitrary pixel values such as `p-[13px]`; pick the closest scale value instead.
 - **i18n**: every user-facing string goes through `useTranslations` or `getTranslations`. Add each new key to **both** `messages/en.json` and `messages/bn.json`, with natural wording in both languages.
 - **Accessibility and layout**: give controls descriptive labels, keep them keyboard-operable, and check the layout from a 375px phone up to desktop, in light and dark themes.
+- **Progress rules** (`src/lib/progress/`) are pure functions with tests. A surah is finished at 190 of 200 slices heard, and seeks, skips and loops must never count as listening. If you change a rule, change its tests and the brief in the same pull request.
 - **Audio data**: every recitation shown in the app has all 114 surahs. If you touch the catalog code in `src/lib/api/`, keep that guarantee and see [Data and sync](#data-and-sync).
 
 ## Verify before you push
@@ -54,6 +55,7 @@ Three committed data files come from scripts that call public APIs. Re-run them 
 | `yarn surahs` | `src/data/surahs.json` | Surah names, verse counts, revelation place |
 | `yarn sources` | `src/data/islamic-network.json` | Keeps only islamic.network recitations whose 114 files all exist |
 | `yarn timings` | `src/data/synced-recitations.json` | Lists recitations whose ayah timings are valid, which decides which ones show the "Synced" badge and can highlight ayahs |
+| `yarn juzs` | `src/data/juzs.json` | The 30 para boundaries; the script checks that every ayah belongs to exactly one para |
 
 The ayah highlight must never show the wrong verse, so timings are rejected unless they pass the strict checks in `src/lib/timings.ts`. If you change those rules, update the tests in `src/lib/timings.test.ts` and `e2e/live-sync.spec.ts` and explain the measured reason in the PR.
 
