@@ -14,6 +14,9 @@ import { useStatsStore } from "@/stores/stats-store";
 import { DataPanel } from "./data-panel";
 import { WeekChart } from "./week-chart";
 
+const MINUTE_STEPS = [5, 10, 15, 30, 60, 120, 240, 480];
+const MINUTES_PER_HOUR = 60;
+
 export function StatsView() {
   const t = useTranslations("stats");
   const locale = useLocale();
@@ -61,7 +64,13 @@ export function StatsView() {
             </h2>
             <p className="text-sm text-muted-foreground">{t("weekDescription")}</p>
           </div>
-          <WeekChart days={lastDays(stats.daily)} />
+          <WeekChart
+            days={lastDays(stats.daily).map(({ date, seconds }) => ({ date, value: Math.round(seconds / 60) }))}
+            steps={MINUTE_STEPS}
+            fallbackStep={MINUTES_PER_HOUR}
+            describe={(minutes) => t("minutes", { count: n(minutes) })}
+            formatNumber={n}
+          />
         </section>
 
         <section aria-labelledby="top-heading" className="flex flex-col gap-4 rounded-2xl border bg-card p-5 lg:col-span-2">

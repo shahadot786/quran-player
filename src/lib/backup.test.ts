@@ -10,6 +10,7 @@ import { usePlayerStore } from "@/stores/player-store";
 import { useProgressStore } from "@/stores/progress-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { useZikirStore } from "@/stores/zikir-store";
 import { resetStores } from "@/test/reset-stores";
 import { createBackup, importBackupFile, InvalidBackupError, parseBackup, resetAllData, restoreBackup } from "./backup";
 
@@ -194,5 +195,79 @@ describe("progress in backups", () => {
     seedStores();
     resetAllData();
     expect(useProgressStore.getState()).toMatchObject({ slices: {}, lifetime: {}, rounds: [], currentRound: 1 });
+  });
+});
+
+describe("zikir in backups", () => {
+  const DAY = new Date(2026, 9, 8, 10).getTime();
+
+  function seedZikir() {
+    const zikir = useZikirStore.getState();
+    const item = zikir.createItem({ name: "Mine", arabic: "سبحان الله", transliteration: "", meaning: "", target: 3, dailyGoal: 10 }, DAY);
+    zikir.createGroup({ name: "Pair", steps: [{ itemId: item, target: 2 }, { itemId: "builtin:allahuAkbar", target: 1 }], dailyGoal: 1 }, DAY);
+    for (let i = 0; i < 3; i += 1) zikir.tap({ kind: "item", id: item }, DAY + i);
+    zikir.tap({ kind: "item", id: "builtin:subhanAllah" }, DAY + 9);
+    zikir.deleteItem("builtin:astaghfirullah", DAY);
+    zikir.setSettings({ view: "dial", sound: false });
+    return item;
+  }
+
+  it("exports the data worth keeping and not this device's rounds in progress or settings", () => {
+    seedZikir();
+    const { zikir } = createBackup().data;
+    expect(Object.keys(zikir!).sort()).toEqual(["builtIns", "counts", "groups", "history", "items"]);
+    expect(zikir!.items).toHaveLength(1);
+    expect(zikir!.history).toHaveLength(1);
+    expect(zikir!.builtIns["builtin:astaghfirullah"]).toMatchObject({ removed: true });
+  });
+
+  it("restores everything it exported", () => {
+    seedZikir();
+    const before = useZikirStore.getState();
+    const json = JSON.stringify(createBackup(new Date("2026-10-08T10:00:00Z")));
+    resetStores();
+
+    restoreBackup(parseBackup(json));
+
+    const after = useZikirStore.getState();
+    expect(after.items).toEqual(before.items);
+    expect(after.groups).toEqual(before.groups);
+    expect(after.counts).toEqual(before.counts);
+    expect(after.history).toEqual(before.history);
+    expect(after.builtIns).toEqual(before.builtIns);
+    expect(after.runs).toEqual({});
+  });
+
+  it("leaves your zikir alone when restoring a backup made before zikir existed", () => {
+    seedZikir();
+    const older = JSON.parse(JSON.stringify(createBackup()));
+    delete older.data.zikir;
+    restoreBackup(parseBackup(JSON.stringify(older)));
+    expect(useZikirStore.getState().items).toHaveLength(1);
+    expect(useZikirStore.getState().history).toHaveLength(1);
+  });
+
+  type Damage = (zikir: { items: Record<string, unknown>[]; groups: Record<string, unknown>[]; counts: Record<string, Record<string, Record<string, unknown>>>; history: Record<string, unknown>[]; builtIns: Record<string, unknown> }) => void;
+
+  it.each<[string, Damage]>([
+    ["an item without a name", (z) => void delete z.items[0]!.name],
+    ["a target of zero", (z) => void (z.items[0]!.target = 0)],
+    ["a group step of zero", (z) => void ((z.groups[0]!.steps as { target: number }[])[0]!.target = 0)],
+    ["a day that is not a date", (z) => void (z.counts["tomorrow"] = {})],
+    ["a negative count", (z) => void (z.counts[Object.keys(z.counts)[0]!]![z.items[0]!.id as string]!.phone = { n: -1, at: 1 })],
+    ["a history entry of an unknown kind", (z) => void (z.history[0]!.kind = "other")],
+    ["a built-in marker that is not a marker", (z) => void (z.builtIns["builtin:x"] = { removed: "yes" })],
+  ])("rejects a backup whose zikir has %s", (_name, damage) => {
+    seedZikir();
+    const backup = JSON.parse(JSON.stringify(createBackup()));
+    damage(backup.data.zikir);
+    expect(() => parseBackup(JSON.stringify(backup))).toThrow(InvalidBackupError);
+  });
+
+  it("clears zikir data on reset but keeps the view and feedback choices", () => {
+    seedZikir();
+    resetAllData();
+    expect(useZikirStore.getState()).toMatchObject({ items: [], groups: [], counts: {}, history: [], builtIns: {}, runs: {} });
+    expect(useZikirStore.getState().settings).toMatchObject({ view: "dial", sound: false });
   });
 });

@@ -9,6 +9,7 @@
     "home": "Home",
     "player": "Player",
     "progress": "Progress",
+    "zikir": "Zikir",
     "reciters": "Reciters",
     "surahs": "Surahs",
     "library": "Library",
@@ -244,7 +245,7 @@
   },
   "data": {
     "title": "Your data",
-    "description": "Back up favorites, playlists, progress and stats, or move them to another browser.",
+    "description": "Back up favorites, playlists, progress, zikir and stats, or move them to another browser.",
     "export": "Export backup",
     "import": "Import backup",
     "exported": "Backup downloaded",
@@ -252,7 +253,7 @@
     "importError": "That file isn’t a Tilawah backup.",
     "reset": "Reset all data",
     "resetTitle": "Reset all data?",
-    "resetDescription": "Favorites, playlists, history, resume points and stats will be erased from this device. Downloads are kept.",
+    "resetDescription": "Favorites, playlists, history, resume points, zikir and stats will be erased from this device. Downloads are kept.",
     "resetConfirm": "Reset",
     "resetDone": "All data reset",
     "cancel": "Cancel"
@@ -426,6 +427,235 @@
       "view": "View full progress",
       "empty": "Start a surah and your progress will show here.",
       "strip": "Progress across the 114 surahs"
+    }
+  },
+  "zikir": {
+    "items": {
+      "subhanAllah": {
+        "name": "SubhanAllah",
+        "transliteration": "SubhanAllah",
+        "meaning": "Glory be to Allah"
+      },
+      "alhamdulillah": {
+        "name": "Alhamdulillah",
+        "transliteration": "Alhamdulillah",
+        "meaning": "All praise is due to Allah"
+      },
+      "allahuAkbar": {
+        "name": "Allahu Akbar",
+        "transliteration": "Allahu Akbar",
+        "meaning": "Allah is the Greatest"
+      },
+      "laIlahaIllallah": {
+        "name": "La ilaha illallah",
+        "transliteration": "La ilaha illallah",
+        "meaning": "There is no god but Allah"
+      },
+      "astaghfirullah": {
+        "name": "Astaghfirullah",
+        "transliteration": "Astaghfirullah",
+        "meaning": "I seek forgiveness from Allah"
+      },
+      "salawat": {
+        "name": "Salawat on the Prophet ﷺ",
+        "transliteration": "Allahumma salli ala Muhammadin wa ala ali Muhammad",
+        "meaning": "O Allah, send blessings upon Muhammad and the family of Muhammad"
+      },
+      "laHawla": {
+        "name": "La hawla wa la quwwata illa billah",
+        "transliteration": "La hawla wa la quwwata illa billah",
+        "meaning": "There is no power and no strength except with Allah"
+      },
+      "subhanAllahiWaBihamdihi": {
+        "name": "SubhanAllahi wa bihamdihi",
+        "transliteration": "SubhanAllahi wa bihamdihi",
+        "meaning": "Glory be to Allah, and praise be to Him"
+      },
+      "ayatAlKursi": {
+        "name": "Ayat al-Kursi",
+        "meaning": "Verse of the Throne, Al-Baqarah 2:255"
+      },
+      "ikhlas": {
+        "name": "Surah Al-Ikhlas",
+        "meaning": "Surah 112"
+      },
+      "falaq": {
+        "name": "Surah Al-Falaq",
+        "meaning": "Surah 113"
+      },
+      "nas": {
+        "name": "Surah An-Nas",
+        "meaning": "Surah 114"
+      },
+      "tahlil": {
+        "name": "La ilaha illallahu wahdahu",
+        "transliteration": "La ilaha illallahu wahdahu la sharika lah, lahul mulku wa lahul hamdu wa huwa ala kulli shay'in qadir",
+        "meaning": "There is no god but Allah alone, with no partner. His is the dominion and His is the praise, and He is able to do all things"
+      },
+      "audhuKalimat": {
+        "name": "A'udhu bikalimatillahit-tammati",
+        "transliteration": "A'udhu bikalimatillahit-tammati min sharri ma khalaq",
+        "meaning": "I seek refuge in the perfect words of Allah from the evil of what He created"
+      }
+    },
+    "groups": {
+      "afterSalah": {
+        "name": "After salah",
+        "description": "Three short phrases in one flow: 33, 33 and 34"
+      },
+      "istighfarSalawat": {
+        "name": "Istighfar and salawat",
+        "description": "Seek forgiveness, then send blessings on the Prophet ﷺ"
+      },
+      "morningAdhkar": {
+        "name": "Morning adhkar",
+        "description": "An ordered set for the morning"
+      },
+      "eveningAdhkar": {
+        "name": "Evening adhkar",
+        "description": "An ordered set for the evening"
+      }
+    },
+    "title": "Zikir",
+    "subtitle": "Count with a tasbih, add your own zikir, and keep track of each day.",
+    "today": "Counted today",
+    "newZikir": "New zikir",
+    "newGroup": "New group",
+    "sections": {
+      "groups": "Groups",
+      "items": "Zikir"
+    },
+    "emptyCustom": "Use the buttons above to make your own zikir or group.",
+    "card": {
+      "count": "Count",
+      "steps": "{count, plural, one {# step} other {# steps}}",
+      "counts": "{count, plural, one {# count} other {# counts}}",
+      "unlimited": "No limit",
+      "builtIn": "Built in",
+      "inProgress": "In progress, {done} of {total}",
+      "options": "Options for {name}",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "delete": "Delete"
+    },
+    "copyName": "{name} (copy)",
+    "editor": {
+      "itemTitleNew": "New zikir",
+      "itemTitleEdit": "Edit zikir",
+      "groupTitleNew": "New group",
+      "groupTitleEdit": "Edit group",
+      "description": "Saved on this device.",
+      "name": "Name",
+      "namePlaceholder": "For example, Morning wird",
+      "arabic": "Arabic text (optional)",
+      "transliteration": "Transliteration (optional)",
+      "meaning": "Meaning (optional)",
+      "noLimit": "Count without a limit",
+      "target": "Count up to",
+      "goalSwitch": "Set a daily goal",
+      "goal": "Daily goal (counts)",
+      "goalRounds": "Daily goal (rounds)",
+      "steps": "Steps",
+      "stepItem": "Zikir for step {number}",
+      "stepTarget": "Count for step {number}",
+      "addStep": "Add step",
+      "moveUp": "Move step {number} up",
+      "moveDown": "Move step {number} down",
+      "removeStep": "Remove step {number}",
+      "save": "Save",
+      "create": "Create",
+      "cancel": "Cancel",
+      "nameRequired": "Give it a name.",
+      "numberInvalid": "Enter a whole number from 1 to 100,000.",
+      "stepsEmpty": "Add at least one step.",
+      "stepsInvalid": "Every step needs a whole number from 1 to 100,000."
+    },
+    "delete": {
+      "itemTitle": "Delete “{name}”?",
+      "groupTitle": "Delete “{name}”?",
+      "description": "This removes it from this device. What you already counted stays in your totals.",
+      "confirm": "Delete",
+      "inUse": "“{name}” is used by {groups}. Remove it from those groups first.",
+      "builtInHint": "It is built in, so it is only hidden. You can bring it back with “Restore removed zikir”."
+    },
+    "toast": {
+      "created": "Created",
+      "saved": "Saved",
+      "deleted": "Deleted",
+      "duplicated": "Copy created",
+      "restored": "Restored"
+    },
+    "counter": {
+      "back": "All zikir",
+      "countButton": "Count {name}",
+      "undo": "Undo",
+      "reset": "Start over",
+      "resetTitle": "Start this round over?",
+      "resetDescription": "What you have counted so far stays in your totals.",
+      "resetConfirm": "Start over",
+      "finish": "Finish round",
+      "step": "Step {current} of {total}",
+      "progress": "{done} of {total}",
+      "countedUnlimited": "{done} counted",
+      "completed": "Round complete",
+      "completedHint": "Alhamdulillah, you reached the target.",
+      "again": "Count again",
+      "next": "Next: {name}",
+      "today": "Today: {count}",
+      "notFound": "This zikir isn’t available anymore.",
+      "backToLibrary": "Back to zikir",
+      "group": "Group",
+      "announce": "{done} of {total}",
+      "finished": "Round saved to your history",
+      "sound": "Sound",
+      "vibration": "Vibration",
+      "settings": "Feedback",
+      "delete": "Delete",
+      "deleteDone": "Deleted",
+      "view": "View",
+      "keepAwake": "Keep screen on",
+      "views": {
+        "beads": "Bead string",
+        "dial": "Dial",
+        "simple": "Simple"
+      }
+    },
+    "restore": {
+      "button": "Restore removed zikir ({count})"
+    },
+    "tabs": {
+      "library": "Library",
+      "stats": "Stats",
+      "history": "History"
+    },
+    "goal": {
+      "today": "Goal today: {done} of {goal}",
+      "rounds": "Goal today: {done} of {goal} rounds",
+      "reached": "Goal reached"
+    },
+    "stats": {
+      "lifetime": "All-time count",
+      "currentStreak": "Current streak",
+      "longestStreak": "Longest streak",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "streakHint": "A day counts when you reach a goal, or when you count anything if you have no goals.",
+      "week": "Last 7 days",
+      "weekDescription": "Counts per day",
+      "counts": "{count, plural, one {# count} other {# counts}}",
+      "top": "Most counted",
+      "empty": "Start counting and your numbers will show up here.",
+      "removed": "Removed zikir"
+    },
+    "history": {
+      "title": "Finished rounds",
+      "empty": "Rounds you finish will be listed here.",
+      "completed": "Completed",
+      "early": "Ended early",
+      "counts": "{count, plural, one {# count} other {# counts}}",
+      "clear": "Clear history",
+      "clearTitle": "Clear your history?",
+      "clearDescription": "This removes the list of finished rounds from this device. Your daily counts stay.",
+      "cleared": "History cleared"
     }
   }
 }

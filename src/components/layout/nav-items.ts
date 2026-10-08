@@ -1,4 +1,4 @@
-import { AudioLinesIcon, BookOpenIcon, ChartColumnIcon, HouseIcon, LibraryIcon, MicVocalIcon, TargetIcon } from "lucide-react";
+import { AudioLinesIcon, BookOpenIcon, ChartColumnIcon, HandHeartIcon, HouseIcon, LibraryIcon, MicVocalIcon, TargetIcon } from "lucide-react";
 
 // "primary" items sit in the phone's bottom bar; the rest go behind its More button. The sidebar lists everything.
 export const NAV_ITEMS = [
@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
   { href: "/surahs", key: "surahs", icon: BookOpenIcon, group: "more" },
   { href: "/library", key: "library", icon: LibraryIcon, group: "primary" },
   { href: "/progress", key: "progress", icon: TargetIcon, group: "primary" },
+  { href: "/zikir", key: "zikir", icon: HandHeartIcon, group: "more" },
   { href: "/stats", key: "stats", icon: ChartColumnIcon, group: "more" },
 ] as const;
 

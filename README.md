@@ -35,6 +35,12 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - **Khatm rounds:** finish all 114 and the round is recorded with its date, then a new one starts.
 - If you used an earlier version, your finished surahs, resume points and history are carried over automatically, and your old data is never modified.
 
+### Zikir
+- **A tasbih you can count on** at `/zikir`: a 3D **bead string** (a 33-bead misbaha with a gold marker bead and tassel) or a 3D **dial**, built with Three.js. Tap, press Enter or Space, or swipe, and one bead moves past with a soft click and a light vibration. A plain 2D counter is always available and is used automatically when WebGL isn't available or you prefer reduced motion.
+- **Ready-made zikir and groups:** SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illallah, Astaghfirullah, salawat and more, and groups that move step by step, such as the after-salah 33, 33 and 34.
+- **Your own zikir and groups:** set a count or no limit, add Arabic text, transliteration and meaning, order the steps of a group, and delete anything you don't want. Built-in ones are hidden rather than lost, and "Restore removed zikir" brings them back.
+- Undo, start over, finish a round by hand, optional sound and vibration, and keep-the-screen-on. An unfinished round is waiting for you when you come back.
+
 ### Your library
 - Favorite reciters and surahs, playlists (create, rename, reorder, play all), and listening history.
 - **Stats**: time listened, surahs completed, current and longest streak, top reciters and a 7-day chart.
@@ -73,6 +79,7 @@ About 100 reciters (roughly 100 recitations) can follow along. Reciters marked *
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack) and [React 19](https://react.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
+- **3D**: [Three.js](https://threejs.org/), loaded only on the zikir counter page and only when a 3D view is shown
 - **State**: [Zustand](https://zustand-demo.pmnd.rs/) persisted to localStorage, with IndexedDB and the Cache API for downloads
 - **i18n**: [next-intl](https://next-intl.dev/) with `messages/en.json` and `messages/bn.json`
 - **PWA and offline**: [Serwist](https://serwist.pages.dev/) (`@serwist/turbopack`)

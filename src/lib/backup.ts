@@ -4,6 +4,7 @@ import { useLibraryStore } from "@/stores/library-store";
 import { usePlayerStore, type PlayerSnapshot } from "@/stores/player-store";
 import { useProgressStore, type ProgressSnapshot } from "@/stores/progress-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { useZikirStore, type ZikirSnapshot } from "@/stores/zikir-store";
 import { localDateKey } from "./format";
 import { decodeSlices } from "./progress/slices";
 import type { Track } from "./types";
@@ -28,7 +29,7 @@ export type Backup = {
   version: typeof BACKUP_VERSION;
   exportedAt: string;
   // Backups made before progress existed don't have it, and restoring one rebuilds it from the rest.
-  data: { settings: SettingsData; player: PlayerSnapshot; library: LibraryData; stats: StatsData; progress?: ProgressSnapshot };
+  data: { settings: SettingsData; player: PlayerSnapshot; library: LibraryData; stats: StatsData; progress?: ProgressSnapshot; zikir?: ZikirSnapshot };
 };
 
 type Guard<T> = (value: unknown) => value is T;
@@ -143,6 +144,63 @@ const isProgress: Guard<ProgressSnapshot> = (value): value is ProgressSnapshot =
   isNonNegative(value.paceAyahs) &&
   isNullableTime(value.legacyImportedAt);
 
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+const isPositiveCount: Guard<number> = (value): value is number => isCount(value) && value >= 1;
+const isOptionalCount = (value: unknown): value is number | null => value === null || isPositiveCount(value);
+
+const isZikirItem = (value: unknown): value is ZikirSnapshot["items"][number] =>
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.name) &&
+  isString(value.arabic) &&
+  isString(value.transliteration) &&
+  isString(value.meaning) &&
+  isOptionalCount(value.target) &&
+  isOptionalCount(value.dailyGoal) &&
+  isNumber(value.createdAt) &&
+  isNumber(value.updatedAt) &&
+  isNullableTime(value.deletedAt);
+
+const isZikirGroup = (value: unknown): value is ZikirSnapshot["groups"][number] =>
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.name) &&
+  arrayOf((step): step is { itemId: string; target: number } => isRecord(step) && isString(step.itemId) && isPositiveCount(step.target))(value.steps) &&
+  isOptionalCount(value.dailyGoal) &&
+  isNumber(value.createdAt) &&
+  isNumber(value.updatedAt) &&
+  isNullableTime(value.deletedAt);
+
+const isDeviceCell = (value: unknown): boolean => isRecord(value) && isCount(value.n) && isNumber(value.at);
+const isZikirCounts = (value: unknown): value is ZikirSnapshot["counts"] =>
+  isRecord(value) &&
+  Object.entries(value).every(
+    ([day, items]) => DAY_KEY.test(day) && isRecord(items) && Object.values(items).every((cells) => isRecord(cells) && Object.values(cells).every(isDeviceCell)),
+  );
+
+const isZikirHistory = (value: unknown): value is ZikirSnapshot["history"][number] =>
+  isRecord(value) &&
+  isString(value.id) &&
+  (value.kind === "item" || value.kind === "group") &&
+  isString(value.refId) &&
+  (value.name === null || isString(value.name)) &&
+  isCount(value.count) &&
+  isNumber(value.finishedAt) &&
+  isBoolean(value.completed);
+
+const isZikir: Guard<ZikirSnapshot> = (value): value is ZikirSnapshot =>
+  isRecord(value) &&
+  arrayOf(isZikirItem)(value.items) &&
+  arrayOf(isZikirGroup)(value.groups) &&
+  isZikirCounts(value.counts) &&
+  arrayOf(isZikirHistory)(value.history) &&
+  recordOf((entry): entry is { removed: boolean; at: number } => isRecord(entry) && isBoolean(entry.removed) && isNumber(entry.at))(value.builtIns);
+
+function zikirSnapshot(): ZikirSnapshot {
+  const { items, groups, counts, history, builtIns } = useZikirStore.getState();
+  return { items, groups, counts, history, builtIns };
+}
+
 function progressSnapshot(): ProgressSnapshot {
   const { slices, lifetime, rounds, currentRound, roundStartedAt, roundSeconds, paceSeconds, paceAyahs, legacyImportedAt } = useProgressStore.getState();
   return { slices, lifetime, rounds, currentRound, roundStartedAt, roundSeconds, paceSeconds, paceAyahs, legacyImportedAt };
@@ -168,6 +226,7 @@ export function createBackup(now = new Date()): Backup {
       },
       stats: { totalSeconds: stats.totalSeconds, daily: stats.daily, reciters: stats.reciters, completed: stats.completed },
       progress: progressSnapshot(),
+      zikir: zikirSnapshot(),
     },
   };
 }
@@ -182,20 +241,28 @@ export function parseBackup(text: string): Backup {
   if (!isRecord(parsed) || parsed.app !== BACKUP_APP || parsed.version !== BACKUP_VERSION || !isString(parsed.exportedAt) || !isRecord(parsed.data)) {
     throw new InvalidBackupError();
   }
-  const { settings, player, library, stats, progress } = parsed.data;
+  const { settings, player, library, stats, progress, zikir } = parsed.data;
   if (!isSettings(settings) || !isPlayer(player) || !isLibrary(library) || !isStats(stats)) throw new InvalidBackupError();
   if (progress !== undefined && !isProgress(progress)) throw new InvalidBackupError();
-  return { app: BACKUP_APP, version: BACKUP_VERSION, exportedAt: parsed.exportedAt, data: { settings, player, library, stats, ...(progress ? { progress } : {}) } };
+  if (zikir !== undefined && !isZikir(zikir)) throw new InvalidBackupError();
+  return {
+    app: BACKUP_APP,
+    version: BACKUP_VERSION,
+    exportedAt: parsed.exportedAt,
+    data: { settings, player, library, stats, ...(progress ? { progress } : {}), ...(zikir ? { zikir } : {}) },
+  };
 }
 
 export function restoreBackup(backup: Backup) {
-  const { settings, player, library, stats, progress } = backup.data;
+  const { settings, player, library, stats, progress, zikir } = backup.data;
   useSettingsStore.setState(settings);
   usePlayerStore.getState().restore(player);
   useLibraryStore.setState(library);
   useStatsStore.setState(stats);
   useProgressStore.getState().restore(progress ?? null);
   if (!progress) importLegacyProgress();
+  // A backup from before zikir existed has nothing to say about it, so what is on this device stays.
+  if (zikir) useZikirStore.getState().restore(zikir);
 }
 
 export function resetAllData() {
@@ -203,6 +270,7 @@ export function resetAllData() {
   useLibraryStore.getState().reset();
   useStatsStore.getState().reset();
   useProgressStore.getState().reset();
+  useZikirStore.getState().reset();
 }
 
 export function saveBackupFile(backup = createBackup()) {

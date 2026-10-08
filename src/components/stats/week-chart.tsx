@@ -1,28 +1,34 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter } from "next-intl";
+import { axisTop } from "@/lib/chart";
 import { localDateKey } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const MINUTE_STEPS = [5, 10, 15, 30, 60, 120, 240, 480];
+type Props = {
+  days: { date: Date; value: number }[];
+  /** Round values the axis can top out at, smallest first. */
+  steps: readonly number[];
+  /** Size of the jumps once the biggest bar is past the last step. */
+  fallbackStep: number;
+  /** Describes a value in words, for the tooltip and the accessible name of each bar. */
+  describe: (value: number) => string;
+  formatNumber?: (value: number) => string;
+};
 
-function axisTop(maxMinutes: number) {
-  return MINUTE_STEPS.find((step) => step >= maxMinutes) ?? Math.ceil(maxMinutes / 60) * 60;
-}
-
-export function WeekChart({ days }: { days: { date: Date; seconds: number }[] }) {
-  const t = useTranslations("stats");
+// A seven-bar chart of one value per day, in the unit the caller chooses.
+export function WeekChart({ days, steps, fallbackStep, describe, formatNumber = String }: Props) {
   const format = useFormatter();
-  const minutes = days.map((day) => Math.round(day.seconds / 60));
-  const top = axisTop(Math.max(...minutes));
+  const values = days.map((day) => day.value);
+  const top = axisTop(Math.max(...values), steps, fallbackStep);
   const todayKey = localDateKey();
 
   return (
     <div className="flex gap-3">
       <div className="flex h-44 w-8 flex-col justify-between pb-px text-right text-xs text-muted-foreground tabular-nums" aria-hidden>
-        <span>{top}</span>
-        <span>{top / 2}</span>
-        <span>0</span>
+        <span>{formatNumber(top)}</span>
+        <span>{formatNumber(top / 2)}</span>
+        <span>{formatNumber(0)}</span>
       </div>
       <div className="min-w-0 flex-1">
         <div className="relative h-44">
@@ -30,8 +36,8 @@ export function WeekChart({ days }: { days: { date: Date; seconds: number }[] })
           <div className="absolute inset-x-0 top-1/2 border-t" aria-hidden />
           <ul className="absolute inset-0 flex border-b">
             {days.map((day, i) => {
-              const label = `${format.dateTime(day.date, { weekday: "long" })}, ${t("minutes", { count: minutes[i]! })}`;
-              const height = `${(minutes[i]! / top) * 100}%`;
+              const label = `${format.dateTime(day.date, { weekday: "long" })}, ${describe(values[i]!)}`;
+              const height = `${(values[i]! / top) * 100}%`;
               return (
                 <li
                   key={localDateKey(day.date)}
@@ -46,7 +52,7 @@ export function WeekChart({ days }: { days: { date: Date; seconds: number }[] })
                     style={{ bottom: height }}
                     className="pointer-events-none absolute z-10 mb-2 hidden rounded-md border bg-popover px-2 py-1 text-center text-xs whitespace-nowrap text-popover-foreground shadow-md group-hover:block group-focus-visible:block"
                   >
-                    <strong className="block font-semibold">{t("minutes", { count: minutes[i]! })}</strong>
+                    <strong className="block font-semibold">{describe(values[i]!)}</strong>
                     <span className="text-muted-foreground">{format.dateTime(day.date, { weekday: "short", day: "numeric", month: "short" })}</span>
                   </span>
                 </li>
