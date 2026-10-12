@@ -10,6 +10,8 @@ export type ItemView = {
   target: number | null;
   dailyGoal: number | null;
   builtIn: boolean;
+  /** Where a built-in zikir comes from, for grouping the library. */
+  collection?: "hisn";
 };
 
 export type StepView = { itemId: string; name: string; target: number };

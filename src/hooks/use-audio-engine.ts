@@ -6,6 +6,7 @@ import { PlaybackRecorder } from "@/lib/progress/recorder";
 import { trackKey } from "@/lib/audio-url";
 import { COMPLETE_RATIO, consumeResume, selectCurrentTrack, usePlayerStore } from "@/stores/player-store";
 import { useProgressStore } from "@/stores/progress-store";
+import { useSessionStore } from "@/stores/session-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
 
@@ -34,7 +35,10 @@ export function useAudioEngine(onError: () => void) {
 
     const flushStats = () => {
       const track = selectCurrentTrack(player.getState());
-      if (track && pendingSeconds > 0) useStatsStore.getState().addListening(pendingSeconds, track);
+      if (track && pendingSeconds > 0) {
+        useStatsStore.getState().addListening(pendingSeconds, track);
+        useSessionStore.getState().addListening(pendingSeconds, track);
+      }
       pendingSeconds = 0;
       recorder.flush();
       lastFlush = performance.now();

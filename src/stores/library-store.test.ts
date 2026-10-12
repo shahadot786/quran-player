@@ -107,3 +107,19 @@ describe("reset", () => {
     expect(library()).toMatchObject({ favoriteReciters: [], favoriteSurahs: [], playlists: [], history: [] });
   });
 });
+
+describe("removal marks", () => {
+  it("records each add and removal of a favorite or playlist with its time, for syncing", () => {
+    const store = useLibraryStore.getState;
+    store().toggleFavoriteSurah(18);
+    expect(store().marks["surah:18"]).toMatchObject({ on: true });
+    store().toggleFavoriteSurah(18);
+    expect(store().marks["surah:18"]).toMatchObject({ on: false });
+    store().toggleFavoriteReciter({ id: 7, name: "R" });
+    expect(store().marks["reciter:7"]).toMatchObject({ on: true });
+    const id = store().createPlaylist("Mine");
+    store().deletePlaylist(id);
+    expect(store().marks[`playlist:${id}`]).toMatchObject({ on: false });
+  });
+});
+

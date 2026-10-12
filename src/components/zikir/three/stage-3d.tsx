@@ -5,6 +5,7 @@ import { CheckIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { useLocalizedNumber } from "@/hooks/use-localized-number";
+import { beadsFor } from "@/lib/zikir/beads";
 import type { ZikirView } from "@/lib/zikir/types";
 import { buildBeadString } from "./bead-string";
 import { buildDial } from "./dial";
@@ -18,12 +19,13 @@ type Props = {
   target: number | null;
   ratio: number | null;
   complete: boolean;
+  still: boolean;
   onCount: () => void;
   onFail: () => void;
 };
 
 // The canvas sits inside a real button, so keyboard, screen readers and counting by tap behave exactly as in the plain counter.
-export default function Stage3D({ view, label, count, target, ratio, complete, onCount, onFail }: Props) {
+export default function Stage3D({ view, label, count, target, ratio, complete, still, onCount, onFail }: Props) {
   const t = useTranslations("zikir.counter");
   const n = useLocalizedNumber();
   const { resolvedTheme } = useTheme();
@@ -32,10 +34,11 @@ export default function Stage3D({ view, label, count, target, ratio, complete, o
   const host = useRef<Host | null>(null);
   const latest = useRef<SceneState>({ count, target, ratio, complete });
   const darkNow = useRef(dark);
+  const beads = beadsFor(target);
 
   useEffect(() => {
     if (!parent.current) return;
-    const mounted = mountScene(parent.current, view === "dial" ? buildDial : buildBeadString, { dark: darkNow.current, onFail });
+    const mounted = mountScene(parent.current, view === "dial" ? buildDial : buildBeadString, { dark: darkNow.current, beads, still, onFail });
     host.current = mounted;
     mounted?.controller.setState(latest.current);
     mounted?.invalidate();
@@ -43,7 +46,7 @@ export default function Stage3D({ view, label, count, target, ratio, complete, o
       mounted?.dispose();
       host.current = null;
     };
-  }, [view, onFail]);
+  }, [view, beads, still, onFail]);
 
   useEffect(() => {
     latest.current = { count, target, ratio, complete };
@@ -71,7 +74,7 @@ export default function Stage3D({ view, label, count, target, ratio, complete, o
       onClick={(event) => {
         if (event.detail === 0) onCount();
       }}
-      className="relative grid size-72 touch-none place-items-center rounded-full outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-96"
+      className="relative grid size-80 touch-none place-items-center rounded-full outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-96"
     >
       <div ref={parent} aria-hidden className="absolute inset-0" />
       <span className="pointer-events-none relative flex flex-col items-center gap-1">

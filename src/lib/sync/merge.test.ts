@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { encodeSlices, markRange, emptySlices } from "@/lib/progress/slices";
 import { makeTrack } from "@/test/fixtures";
-import { mergeSnapshots, sameSnapshot, stableStringify } from "./merge";
+import { mergeSnapshots, sameSnapshot, stableStringify, syncWindow, unionSessions } from "./merge";
+import { SYNC_SESSION_LIMIT } from "./limits";
 import { isSyncSnapshot } from "./snapshot";
 import type { SyncSnapshot } from "./types";
 
@@ -54,6 +55,17 @@ describe("progress", () => {
   });
 });
 
+describe("khatm plan", () => {
+  it("keeps the newer plan, including a newer removal", () => {
+    const set = withProgress({ plan: { finishBy: "2027-03-08", updatedAt: 5 } });
+    const removed = withProgress({ plan: { finishBy: null, updatedAt: 9 } });
+    expect(mergeSnapshots(set, removed).progress.plan).toEqual({ finishBy: null, updatedAt: 9 });
+    expect(mergeSnapshots(removed, set).progress.plan).toEqual({ finishBy: null, updatedAt: 9 });
+    expect(mergeSnapshots(set, EMPTY).progress.plan).toEqual({ finishBy: "2027-03-08", updatedAt: 5 });
+    expect(mergeSnapshots(EMPTY, EMPTY).progress.plan).toBeUndefined();
+  });
+});
+
 describe("zikir", () => {
   it("adds up what two devices counted, and keeps the newer cell of one device", () => {
     const a = withZikir({ counts: { "2026-10-08": { dhikr: { phone: { n: 10, at: 5 } } } } });
@@ -76,6 +88,68 @@ describe("zikir", () => {
     const merged = mergeSnapshots(a, b).zikir;
     expect(merged.history.map((h) => h.id).sort()).toEqual(["1", "2"]);
     expect(merged.builtIns.w).toEqual({ removed: false, at: 9 });
+  });
+});
+
+describe("listening sessions", () => {
+  const session = (id: string, startedAt: number, seconds = 60) => ({
+    id, day: "2026-10-01", startedAt, updatedAt: startedAt, surah: 1, reciterId: 1, reciterName: "R", moshafId: 1, seconds,
+  });
+  const DAY = 24 * 60 * 60 * 1000;
+
+  it("keeps each session once, the longer copy when both devices have it, newest first", () => {
+    const merged = unionSessions([session("a", 1, 30), session("b", 3)], [session("a", 1, 90), session("c", 2)]);
+    expect(merged.map((s) => [s.id, s.seconds])).toEqual([["b", 60], ["c", 60], ["a", 90]]);
+  });
+
+  it("sends only the last 90 days and at most the newest 500 to the cloud", () => {
+    const newest = 400 * DAY;
+    expect(syncWindow([session("new", newest), session("edge", newest - 90 * DAY), session("old", newest - 91 * DAY)]).map((s) => s.id)).toEqual(["new", "edge"]);
+    const many = Array.from({ length: SYNC_SESSION_LIMIT + 10 }, (_, i) => session(`s${i}`, newest - i));
+    expect(syncWindow(many)).toHaveLength(SYNC_SESSION_LIMIT);
+  });
+
+  it("leaves copies without a log alone, and fills in the log from whichever side has one", () => {
+    expect(mergeSnapshots(EMPTY, EMPTY).sessions).toBeUndefined();
+    expect(mergeSnapshots(EMPTY, { ...EMPTY, sessions: [session("a", 1)] }).sessions).toHaveLength(1);
+  });
+});
+
+describe("removing from the library", () => {
+  const lib = (patch: Partial<SyncSnapshot["library"]>): SyncSnapshot => ({ ...EMPTY, library: { ...EMPTY.library, ...patch } });
+  const list = (id: string) => ({ id, name: id, tracks: [], createdAt: 1, updatedAt: 1 });
+
+  it("keeps a favorite or playlist removed on one device removed after syncing with a device that still has it", () => {
+    const phone = lib({ favoriteSurahs: [18], favoriteReciters: [{ id: 7, name: "R" }], playlists: [list("p")] });
+    const laptop = lib({ marks: { "surah:18": { on: false, at: 9 }, "reciter:7": { on: false, at: 9 }, "playlist:p": { on: false, at: 9 } } });
+    for (const merged of [mergeSnapshots(phone, laptop), mergeSnapshots(laptop, phone)]) {
+      expect(merged.library.favoriteSurahs).toEqual([]);
+      expect(merged.library.favoriteReciters).toEqual([]);
+      expect(merged.library.playlists).toEqual([]);
+    }
+  });
+
+  it("lets a later add win over an earlier removal", () => {
+    const removed = lib({ marks: { "surah:18": { on: false, at: 5 } } });
+    const readded = lib({ favoriteSurahs: [18], marks: { "surah:18": { on: true, at: 9 } } });
+    expect(mergeSnapshots(removed, readded).library.favoriteSurahs).toEqual([18]);
+  });
+
+  it("treats copies without removals as before", () => {
+    expect(mergeSnapshots(lib({ favoriteSurahs: [1] }), lib({ favoriteSurahs: [2] })).library).toEqual({ ...EMPTY.library, favoriteSurahs: [1, 2] });
+  });
+});
+
+describe("ayah bookmarks", () => {
+  const mark = (note: string, updatedAt: number, deletedAt: number | null = null) => ({ surah: 18, ayah: 10, note, createdAt: 1, updatedAt, deletedAt });
+
+  it("keeps the later change of a bookmark, a removal included", () => {
+    const a = { ...EMPTY, bookmarks: { "18:10": mark("old note", 5) } };
+    const b = { ...EMPTY, bookmarks: { "18:10": mark("old note", 9, 9), "2:255": { ...mark("", 3), surah: 2, ayah: 255 } } };
+    const merged = mergeSnapshots(a, b).bookmarks!;
+    expect(merged["18:10"]).toMatchObject({ deletedAt: 9 });
+    expect(Object.keys(merged).sort()).toEqual(["18:10", "2:255"]);
+    expect(mergeSnapshots(EMPTY, EMPTY).bookmarks).toBeUndefined();
   });
 });
 
@@ -114,7 +188,31 @@ function rng(seed: number) {
   };
 }
 
+// A device that last added an item has it and one that last removed it doesn't, so the marks are applied to the lists here.
+function withMarks(snapshot: SyncSnapshot, random: () => number): SyncSnapshot {
+  if (random() >= 0.6) return snapshot;
+  const key = ["surah:1", "surah:2", "reciter:1", "playlist:p1"][Math.floor(random() * 4)]!;
+  const [kind, id] = key.split(":") as [string, string];
+  // Playlists are only ever marked when deleted: a new playlist always gets a new id.
+  const on = kind !== "playlist" && random() < 0.5;
+  const library = { ...snapshot.library, marks: { [key]: { on, at: Math.floor(random() * 20) } } };
+  if (kind === "surah") {
+    const others = library.favoriteSurahs.filter((surah) => surah !== Number(id));
+    library.favoriteSurahs = on ? [...others, Number(id)].sort((x, y) => x - y) : others;
+  } else if (kind === "reciter") {
+    const others = library.favoriteReciters.filter((reciter) => reciter.id !== Number(id));
+    library.favoriteReciters = on ? [...others, { id: Number(id), name: "R" }] : others;
+  } else {
+    library.playlists = library.playlists.filter((playlist) => playlist.id !== id);
+  }
+  return { ...snapshot, library };
+}
+
 function randomSnapshot(random: () => number): SyncSnapshot {
+  return withMarks(randomSnapshotWithoutMarks(random), random);
+}
+
+function randomSnapshotWithoutMarks(random: () => number): SyncSnapshot {
   const int = (max: number) => Math.floor(random() * max);
   const some = <T>(count: number, make: () => T) => Array.from({ length: int(count) }, make);
   const slices: Record<number, string> = {};
@@ -157,6 +255,7 @@ function randomSnapshot(random: () => number): SyncSnapshot {
       paceSeconds: int(100),
       paceAyahs: int(100),
       legacyImportedAt: random() < 0.5 ? null : int(100),
+      ...(random() < 0.5 ? { plan: { finishBy: random() < 0.3 ? null : `2027-0${1 + int(3)}-01`, updatedAt: int(20) } } : {}),
     },
     zikir: {
       items: some(3, () => item(`i${int(3)}`, int(10), { name: `n${int(3)}`, deletedAt: random() < 0.3 ? int(10) : null })),
@@ -165,6 +264,22 @@ function randomSnapshot(random: () => number): SyncSnapshot {
       history: some(4, () => ({ id: `h${int(4)}`, kind: "item" as const, refId: "x", name: null, count: 1 + int(5), finishedAt: int(100), completed: true })),
       builtIns: { [`b${int(2)}`]: { removed: random() < 0.5, at: int(20) } },
     },
+    ...(random() < 0.6
+      ? {
+          bookmarks: Object.fromEntries(
+            some(3, () => 1 + int(3)).map((surah) => [`${surah}:1`, { surah, ayah: 1, note: `n${int(3)}`, createdAt: 1, updatedAt: int(20), deletedAt: random() < 0.3 ? int(20) : null }]),
+          ),
+        }
+      : {}),
+    ...(random() < 0.7
+      ? {
+          sessions: unionSessions(
+            // A session's id and start never change once it exists; only its length grows.
+            some(5, () => int(6)).map((k) => ({ id: `s${k}`, day: "2026-10-01", startedAt: k * 3e9, updatedAt: 1, surah: 1, reciterId: 1, reciterName: "R", moshafId: 1, seconds: int(100) })),
+            [],
+          ),
+        }
+      : {}),
   };
 }
 

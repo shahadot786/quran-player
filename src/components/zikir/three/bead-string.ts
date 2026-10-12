@@ -1,9 +1,8 @@
-import { BEAD_COUNT, activeBead, beadStep, ringOffset, shouldSnap } from "@/lib/zikir/beads";
+import { activeBead, beadRadius, beadStep, ringOffset, shouldSnap } from "@/lib/zikir/beads";
 import { smoothDamp, type Spring } from "@/lib/zikir/motion";
 import type { SceneBuilder, SceneState } from "./types";
 
-const LOOP_RADIUS = 2.6;
-const BEAD_RADIUS = 0.2;
+const LOOP_RADIUS = 2.9;
 const TILT = -0.75;
 const SMOOTH_SECONDS = 0.12;
 const GOLD = 0xd4a83f;
@@ -13,8 +12,8 @@ const PALETTE = {
   dark: { bead: 0x6fbf9d, active: 0xa6e3c8, thread: 0x5f6b66 },
 };
 
-// A misbaha seen at an angle: 33 beads on a thread, with a gold marker bead and a tassel. Each count turns the loop by one bead.
-export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark }) => {
+// A misbaha seen at an angle: one bead per count of the target, with a gold marker bead and a tassel. Each count turns the loop by one bead.
+export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark, beads: beadCount, still }) => {
   camera.position.set(0, 0.5, 13.6);
   camera.lookAt(0, 0, 0);
 
@@ -39,9 +38,10 @@ export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark }) =>
 
   ring.add(new THREE.Mesh(new THREE.TorusGeometry(LOOP_RADIUS, 0.03, 8, 128), threadMaterial));
 
-  const beadGeometry = new THREE.SphereGeometry(BEAD_RADIUS, 28, 20);
-  const step = beadStep();
-  const beads = Array.from({ length: BEAD_COUNT }, (_, index) => {
+  const radius = beadRadius(beadCount, LOOP_RADIUS);
+  const beadGeometry = new THREE.SphereGeometry(radius, 28, 20);
+  const step = beadStep(beadCount);
+  const beads = Array.from({ length: beadCount }, (_, index) => {
     const bead = new THREE.Mesh(beadGeometry, index === 0 ? markerMaterial : beadMaterial);
     const angle = index * step;
     bead.position.set(Math.cos(angle) * LOOP_RADIUS, Math.sin(angle) * LOOP_RADIUS, 0);
@@ -55,16 +55,17 @@ export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark }) =>
   tassel.rotation.z = -Math.PI / 2;
   const tasselMaterial = new THREE.MeshStandardMaterial({ color: GOLD, roughness: 0.6 });
   // Local +y points away from the loop; the cone is turned so its point meets the bead and it flares outward like a tassel.
-  const tasselCone = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.62, 16), tasselMaterial);
-  tasselCone.position.y = 0.5;
+  const tasselScale = Math.max(0.6, radius / 0.2);
+  const tasselCone = new THREE.Mesh(new THREE.ConeGeometry(0.17 * tasselScale, 0.62 * tasselScale, 16), tasselMaterial);
+  tasselCone.position.y = 0.5 * tasselScale;
   tasselCone.rotation.z = Math.PI;
   tassel.add(tasselCone);
   ring.add(tassel);
 
   let state: SceneState = { count: 0, target: null, ratio: null, complete: false };
-  let spring: Spring = { value: ringOffset(0), velocity: 0 };
+  let spring: Spring = { value: ringOffset(0, beadCount), velocity: 0 };
   let goal = spring.value;
-  let active = activeBead(0);
+  let active = activeBead(0, beadCount);
   let pulse = 0;
   let celebrate = 0;
   let previousActive = -1;
@@ -82,13 +83,13 @@ export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark }) =>
     setState: (next) => {
       const becameComplete = next.complete && !state.complete;
       state = next;
-      goal = ringOffset(next.count);
-      if (shouldSnap(spring.value, goal)) spring = { value: goal, velocity: 0 };
-      active = activeBead(next.count);
-      if (becameComplete) celebrate = 1;
+      goal = ringOffset(next.count, beadCount);
+      if (still || shouldSnap(spring.value, goal, beadCount)) spring = { value: goal, velocity: 0 };
+      active = activeBead(next.count, beadCount);
+      if (becameComplete && !still) celebrate = 1;
     },
     pulse: () => {
-      pulse = 1;
+      if (!still) pulse = 1;
     },
     update: (dt) => {
       spring = smoothDamp(spring, goal, SMOOTH_SECONDS, dt);
@@ -107,7 +108,7 @@ export const buildBeadString: SceneBuilder = ({ THREE, scene, camera, dark }) =>
       beads.forEach((bead, index) => {
         if (index === 0) return;
         const target = index === active ? 1.22 : 1;
-        bead.scale.setScalar(bead.scale.x + (target - bead.scale.x) * Math.min(1, dt * 18));
+        bead.scale.setScalar(still ? target : bead.scale.x + (target - bead.scale.x) * Math.min(1, dt * 18));
       });
       return Math.abs(goal - spring.value) > 0.0005 || Math.abs(spring.velocity) > 0.0005 || pulse > 0 || celebrate > 0;
     },

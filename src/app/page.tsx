@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { ContinueListening } from "@/components/home/continue-listening";
 import { FavoriteReciters } from "@/components/home/favorite-reciters";
 import { HomeHero } from "@/components/home/home-hero";
+import { TodayCard } from "@/components/home/today-card";
+import { DueReminders } from "@/components/reminders/due-reminders";
 import { ReciterCard } from "@/components/reciter-card";
 import { Button } from "@/components/ui/button";
 import { getFeaturedReciters } from "@/lib/api/reciters";
@@ -14,6 +16,9 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-12">
       <HomeHero />
+      <TodayCard>
+        <DueReminders />
+      </TodayCard>
       <ContinueListening />
       <FavoriteReciters />
       <section aria-labelledby="featured-heading" className="flex flex-col gap-4">

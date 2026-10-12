@@ -96,13 +96,21 @@ test("uses the plain counter when the browser has no WebGL", async ({ page }) =>
   await expect(ringText(page, "1 of 3")).toBeVisible();
 });
 
-test("uses the plain counter when reduced motion is preferred", async ({ page }) => {
+test("keeps the chosen 3D view when reduced motion is preferred, without animating it", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await seed(page);
   await page.goto("/zikir/three");
-  await expect(stage(page)).toBeVisible();
-  await expect(canvas(page)).toHaveCount(0);
+  await expect(canvas(page)).toHaveCount(1);
   await stage(page).click();
+  await expect(ringText(page, "1 of 3")).toBeVisible();
+  // A still scene is fully drawn by the next frame, so two later pictures match.
+  await page.waitForTimeout(150);
+  const first = await stage(page).screenshot();
+  await page.waitForTimeout(250);
+  expect((await stage(page).screenshot()).equals(first)).toBe(true);
+
+  await page.getByRole("button", { name: "Dial" }).click();
+  await expect(canvas(page)).toHaveCount(1);
   await expect(ringText(page, "1 of 3")).toBeVisible();
 });
 

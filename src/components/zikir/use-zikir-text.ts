@@ -26,6 +26,7 @@ export function useZikirText() {
       target: item.target,
       dailyGoal: null,
       builtIn: true,
+      collection: item.collection,
     });
     const userItem = (item: ZikirItem): ItemView => ({ ...item, builtIn: false });
 

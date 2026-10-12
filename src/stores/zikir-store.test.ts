@@ -231,8 +231,8 @@ describe("undo, reset and finish", () => {
     const ref = { kind: "group", id: "builtin:afterSalah" } as const;
     taps(ref, 34);
     expect(zikir().runs["group:builtin:afterSalah"]).toMatchObject({ step: 1, count: 1 });
-    zikir().undo(ref);
-    zikir().undo(ref);
+    zikir().undo(ref, DAY + 100);
+    zikir().undo(ref, DAY + 101);
     expect(zikir().runs["group:builtin:afterSalah"]).toMatchObject({ step: 0, count: 32 });
     expect(itemDayTotal(zikir().counts, TODAY, "builtin:alhamdulillah")).toBe(0);
   });

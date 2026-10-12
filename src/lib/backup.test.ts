@@ -5,9 +5,11 @@ import { makeTrack } from "@/test/fixtures";
 vi.mock("@/lib/audio", () => ({ getAudio: () => createFakeAudio() }));
 
 import { decodeSlices, emptySlices, encodeSlices, fullSlices, isFinished, markRange } from "@/lib/progress/slices";
+import { useBookmarkStore } from "@/stores/bookmark-store";
 import { useLibraryStore } from "@/stores/library-store";
 import { usePlayerStore } from "@/stores/player-store";
 import { useProgressStore } from "@/stores/progress-store";
+import { useSessionStore } from "@/stores/session-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useStatsStore } from "@/stores/stats-store";
 import { useZikirStore } from "@/stores/zikir-store";
@@ -269,5 +271,48 @@ describe("zikir in backups", () => {
     resetAllData();
     expect(useZikirStore.getState()).toMatchObject({ items: [], groups: [], counts: {}, history: [], builtIns: {}, runs: {} });
     expect(useZikirStore.getState().settings).toMatchObject({ view: "dial", sound: false });
+  });
+});
+
+describe("listening log in backups", () => {
+  beforeEach(() => resetStores());
+
+  it("exports, restores and resets the log, and leaves it alone for a backup that has none", () => {
+    useSessionStore.getState().addListening(120, makeTrack({ surah: 36 }));
+    const json = JSON.stringify(createBackup());
+    const older = JSON.parse(json);
+    delete older.data.sessions;
+    resetStores();
+
+    restoreBackup(parseBackup(json));
+    expect(useSessionStore.getState().sessions).toMatchObject([{ surah: 36, seconds: 120 }]);
+
+    restoreBackup(parseBackup(JSON.stringify(older)));
+    expect(useSessionStore.getState().sessions).toHaveLength(1);
+
+    resetAllData();
+    expect(useSessionStore.getState().sessions).toEqual([]);
+  });
+
+  it("rejects a backup with a broken log", () => {
+    const backup = createBackup();
+    const broken = { ...backup, data: { ...backup.data, sessions: [{ id: "x", day: "today", surah: 1 }] } };
+    expect(() => parseBackup(JSON.stringify(broken))).toThrow(InvalidBackupError);
+  });
+});
+
+describe("bookmarks in backups", () => {
+  beforeEach(() => resetStores());
+
+  it("exports, restores and resets bookmarks, and rejects broken ones", () => {
+    useBookmarkStore.getState().setNote(2, 255, "Ayat al-Kursi");
+    const backup = createBackup();
+    resetStores();
+    restoreBackup(parseBackup(JSON.stringify(backup)));
+    expect(useBookmarkStore.getState().bookmarks["2:255"]).toMatchObject({ note: "Ayat al-Kursi" });
+    resetAllData();
+    expect(useBookmarkStore.getState().bookmarks).toEqual({});
+    const broken = { ...backup, data: { ...backup.data, bookmarks: { "2:255": { surah: 2, ayah: 7, note: "" } } } };
+    expect(() => parseBackup(JSON.stringify(broken))).toThrow(InvalidBackupError);
   });
 });

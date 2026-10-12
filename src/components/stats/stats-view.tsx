@@ -11,8 +11,10 @@ import { computeStreaks, lastDays, topReciters } from "@/lib/stats";
 import { useHydrated } from "@/stores/hydration";
 import { useProgressStore } from "@/stores/progress-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { ReminderSettings } from "@/components/reminders/reminder-settings";
 import { SyncCard } from "@/components/sync/sync-card";
 import { DataPanel } from "./data-panel";
+import { ListeningCalendar } from "./listening-calendar";
 import { WeekChart } from "./week-chart";
 
 const MINUTE_STEPS = [5, 10, 15, 30, 60, 120, 240, 480];
@@ -57,6 +59,8 @@ export function StatsView() {
         <StatTile label={t("longestStreak")} value={t("days", { count: streaks.longest })} />
       </div>
 
+      <ListeningCalendar />
+
       <div className="grid gap-6 lg:grid-cols-5">
         <section aria-labelledby="week-heading" className="flex flex-col gap-4 rounded-2xl border bg-card p-5 lg:col-span-3">
           <div>
@@ -98,6 +102,7 @@ export function StatsView() {
         </section>
       </div>
 
+      <ReminderSettings />
       <DataPanel />
       <SyncCard />
     </div>

@@ -18,13 +18,13 @@ type Props = {
 };
 
 function Placeholder() {
-  return <div aria-hidden className="size-72 rounded-full bg-muted/40 motion-safe:animate-pulse sm:size-96" />;
+  return <div aria-hidden className="size-80 rounded-full bg-muted/40 motion-safe:animate-pulse sm:size-96" />;
 }
 
 // three.js is only downloaded when a 3D view is actually going to be shown.
 const Stage3D = dynamic(() => import("./three/stage-3d"), { ssr: false, loading: Placeholder });
 
-// Picks the 3D view when it can run, and the plain counter whenever it can't or shouldn't: no WebGL, a lost GPU context, or reduced motion.
+// Picks the 3D view when it can run, and the plain counter when it can't: no WebGL or a lost GPU context. Reduced motion keeps the chosen view but stills it.
 export function CounterStage(props: Props) {
   const reducedMotion = useReducedMotion();
   const webgl = useWebGL();
@@ -32,7 +32,7 @@ export function CounterStage(props: Props) {
   const onFail = useCallback(() => setFailed(true), []);
 
   const { view, ...counter } = props;
-  if (view === "simple" || reducedMotion || failed || webgl === false) return <Counter2D {...counter} />;
+  if (view === "simple" || failed || webgl === false) return <Counter2D {...counter} />;
   if (webgl === null) return <Placeholder />;
-  return <Stage3D view={view} {...counter} onFail={onFail} />;
+  return <Stage3D view={view} {...counter} still={reducedMotion} onFail={onFail} />;
 }

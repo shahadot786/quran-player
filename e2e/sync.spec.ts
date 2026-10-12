@@ -63,10 +63,10 @@ test("makes a key on the first visit, keeps it hidden until asked, and uploads o
 
   await expect(card.getByText("Not synced yet")).toBeVisible();
   const key = await storedKey(page);
-  expect(key).toMatch(/^[a-z]{3,8}(-[a-z]{3,8}){7}$/);
-  await expect(card.getByText(key)).toHaveCount(0);
+  expect(key).toMatch(/^\d{1,2}(-[a-z]+){11}$/);
+  await expect(card.getByText(key.replace(/-/g, " "))).toHaveCount(0);
   await card.getByRole("button", { name: "Show key" }).click();
-  await expect(card.getByText(key)).toBeVisible();
+  await expect(card.getByText(key.replace(/-/g, " "))).toBeVisible();
   await card.getByRole("button", { name: "Hide key" }).click();
   expect(cloud.calls).toEqual([]);
 
@@ -122,7 +122,7 @@ test("says what went wrong and keeps the data when the key is wrong, the network
   await dialog.getByLabel("Sync key").fill("nonsense");
   await dialog.getByRole("button", { name: "Restore", exact: true }).click();
   await expect(dialog.getByRole("alert")).toContainText("That isn’t a valid sync key.");
-  await dialog.getByLabel("Sync key").fill("abandon-ability-able-about-above-absent-absorb-abstract");
+  await dialog.getByLabel("Sync key").fill("7 quiet golden camels slowly stroll past the sunny river at dawn");
   await dialog.getByRole("button", { name: "Restore", exact: true }).click();
   await expect(dialog.getByRole("alert")).toHaveText("There is no cloud data for that key.");
   await dialog.getByRole("button", { name: "Cancel" }).click();
@@ -152,4 +152,18 @@ test("deletes the cloud copy after confirmation and keeps the data on the device
   await expect(card.getByText("Not synced yet")).toBeVisible();
   expect(cloud.records.size).toBe(0);
   expect(await storedDaily(page)).toEqual({ "2026-10-01": 60 });
+});
+
+test("saves the key as a text file with how to use it", async ({ page }) => {
+  await seedDay(page, "2026-10-01", 60);
+  const card = await openSync(page);
+  const key = await storedKey(page);
+  const download = page.waitForEvent("download");
+  await card.getByRole("button", { name: "Save as file" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("tilawah-sync-key.txt");
+  const { readFile } = await import("node:fs/promises");
+  const text = await readFile((await file.path())!, "utf8");
+  expect(text).toContain(key.replace(/-/g, " "));
+  expect(text).toContain("Restore from key");
 });

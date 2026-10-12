@@ -2,7 +2,6 @@ import { litTicks } from "@/lib/zikir/beads";
 import { smoothDamp, type Spring } from "@/lib/zikir/motion";
 import type { SceneBuilder, SceneState } from "./types";
 
-const TICKS = 60;
 const FACE_RADIUS = 2.15;
 const BEZEL_RADIUS = 2.4;
 const TICK_RADIUS = 1.9;
@@ -16,8 +15,8 @@ const PALETTE = {
   dark: { face: 0x13221d, tickOff: 0x2c3d37, arc: GOLD, done: 0x6fbf9d },
 };
 
-// A tasbih counter dial: a gold bezel, a face with 60 ticks that light up with the count, and an arc that fills toward the target.
-export const buildDial: SceneBuilder = ({ THREE, scene, camera, dark }) => {
+// A tasbih counter dial: a gold bezel, a face with one tick per count of the target that lights up with the count, and an arc that fills toward the target.
+export const buildDial: SceneBuilder = ({ THREE, scene, camera, dark, beads: tickCount, still }) => {
   camera.position.set(0, 0, 11.8);
   camera.lookAt(0, 0, 0);
 
@@ -41,8 +40,8 @@ export const buildDial: SceneBuilder = ({ THREE, scene, camera, dark }) => {
   const tickOff = new THREE.MeshStandardMaterial({ roughness: 0.6 });
   const tickOn = new THREE.MeshStandardMaterial({ color: GOLD, emissive: new THREE.Color(GOLD), emissiveIntensity: 0.55, roughness: 0.4 });
   const tickGeometry = new THREE.BoxGeometry(0.06, 0.22, 0.08);
-  const ticks = Array.from({ length: TICKS }, (_, index) => {
-    const angle = Math.PI / 2 - (index / TICKS) * Math.PI * 2;
+  const ticks = Array.from({ length: tickCount }, (_, index) => {
+    const angle = Math.PI / 2 - (index / tickCount) * Math.PI * 2;
     const tick = new THREE.Mesh(tickGeometry, tickOff);
     tick.position.set(Math.cos(angle) * TICK_RADIUS, Math.sin(angle) * TICK_RADIUS, 0.2);
     tick.rotation.z = angle - Math.PI / 2;
@@ -93,10 +92,11 @@ export const buildDial: SceneBuilder = ({ THREE, scene, camera, dark }) => {
     setState: (next) => {
       const becameComplete = next.complete && !state.complete;
       state = next;
-      if (becameComplete) celebrate = 1;
+      if (becameComplete && !still) celebrate = 1;
       const filled = next.complete ? 1 : (next.ratio ?? 0);
       setArc(filled);
-      const nowLit = next.complete ? TICKS : litTicks(next.ratio, TICKS);
+      // Without a target there is nothing to fill, so the ticks go round with the count instead.
+      const nowLit = next.complete ? tickCount : next.ratio === null ? next.count % tickCount : litTicks(next.ratio, tickCount);
       if (nowLit !== lit) {
         lit = nowLit;
         ticks.forEach((tick, index) => {
@@ -106,7 +106,7 @@ export const buildDial: SceneBuilder = ({ THREE, scene, camera, dark }) => {
       paint();
     },
     pulse: () => {
-      pressGoal = PRESS_DEPTH;
+      if (!still) pressGoal = PRESS_DEPTH;
     },
     update: (dt) => {
       if (pressGoal > 0 && press.value > PRESS_DEPTH * 0.9) pressGoal = 0;

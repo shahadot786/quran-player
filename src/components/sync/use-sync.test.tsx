@@ -19,6 +19,17 @@ describe("useSync", () => {
     expect(useSyncStore.getState().ensureKey()).toBe(first);
   });
 
+  it("keeps an older eight-word key, so its cloud copy stays reachable", () => {
+    const old = "abandon-ability-able-about-above-absent-absorb-abstract";
+    useSyncStore.setState({ key: old });
+    expect(useSyncStore.getState().ensureKey()).toBe(old);
+  });
+
+  it("replaces a key that is neither kind", () => {
+    useSyncStore.setState({ key: "something-else" });
+    expect(useSyncStore.getState().ensureKey().split("-")).toHaveLength(12);
+  });
+
   it("uploads on sync and remembers when", async () => {
     const cloud = createFakeSyncApi();
     listen("2026-10-01", 60);

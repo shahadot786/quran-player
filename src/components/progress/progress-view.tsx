@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProgressModel } from "@/hooks/use-progress-model";
 import { useHydrated } from "@/stores/hydration";
 import { KhatmHistory } from "./khatm-history";
+import { KhatmPlan } from "./khatm-plan";
 import { Overview } from "./overview";
 import { ParaGrid } from "./para-grid";
 import { SurahGrid } from "./surah-grid";
@@ -50,6 +51,8 @@ export function ProgressView() {
       )}
 
       <Overview model={model} />
+
+      <KhatmPlan />
 
       <Tabs defaultValue="paras" className="gap-5">
         <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">

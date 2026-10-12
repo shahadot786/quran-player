@@ -16,7 +16,7 @@ function disposeScene(scene: THREE.Scene) {
 }
 
 // Owns the renderer and the frame loop. It draws only while something is moving, and not at all when hidden or scrolled away.
-export function mountScene(parent: HTMLElement, build: SceneBuilder, options: { dark: boolean; onFail: () => void }): Host | null {
+export function mountScene(parent: HTMLElement, build: SceneBuilder, options: { dark: boolean; beads: number; still: boolean; onFail: () => void }): Host | null {
   let renderer: THREE.WebGLRenderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
@@ -32,7 +32,7 @@ export function mountScene(parent: HTMLElement, build: SceneBuilder, options: { 
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
-  const controller = build({ THREE, scene, camera, dark: options.dark });
+  const controller = build({ THREE, scene, camera, dark: options.dark, beads: options.beads, still: options.still });
 
   let frame = 0;
   let last = 0;

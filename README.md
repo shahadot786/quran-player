@@ -29,6 +29,8 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - The highlight only follows when real ayah timings exist for that exact recording, so it never guesses. See [How the sync works](#how-the-ayah-sync-works).
 
 ### Quran progress
+- **Home at a glance:** today's date with the Hijri date, Quran progress, today's listening and zikir, your streak, your khatm plan and a reminder to sync when it's been a while.
+- **Khatm planner:** pick a finish date (in 30 days, by the end of Ramadan, or any day) and see about how many paras and minutes a day get you there.
 - **A full picture of your khatm** at `/progress`, with a summary card on the player page: percent of the Quran heard, surahs and paras finished, ayahs heard, time listened, daily average and an estimate of the time left.
 - **A grid of all 30 paras and all 114 surahs.** Tap a surah to see which parts you have heard, how many times you finished it, when you last listened, your most-used reciter and the time spent.
 - **Honest numbers.** A surah counts as finished only when 95% of it was actually heard, so seeking to the end or replaying a part doesn't count. Paras that cut through a surah are labelled "estimated".
@@ -36,22 +38,27 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - If you used an earlier version, your finished surahs, resume points and history are carried over automatically, and your old data is never modified.
 
 ### Zikir
-- **A tasbih you can count on** at `/zikir`: a 3D **bead string** (a 33-bead misbaha with a gold marker bead and tassel) or a 3D **dial**, built with Three.js. Tap, press Enter or Space, or swipe, and one bead moves past with a soft click and a light vibration. A plain 2D counter is always available and is used automatically when WebGL isn't available or you prefer reduced motion.
+- **A tasbih you can count on** at `/zikir`: a 3D **bead string** (a misbaha with one bead per count of the target, up to 100, with a gold marker bead and tassel) or a 3D **dial** whose ticks follow the target, built with Three.js. Tap, press Enter or Space, or swipe, and one bead moves past with a soft click and a light vibration. With reduced motion on, the chosen 3D view stays but nothing spins. A plain 2D counter is always available and is used when WebGL isn't.
 - **Ready-made zikir and groups:** SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illallah, Astaghfirullah, salawat and more, and groups that move step by step, such as the after-salah 33, 33 and 34.
+- **Morning and evening adhkar from Hisnul Muslim:** two groups that run the book's morning and evening remembrance in order (Ayat al-Kursi, the three Quls, Sayyid al-Istighfar and the rest, with each count), and every entry on its own with the Arabic, a transliteration and the meaning in English and Bengali. The wording that changes between morning and evening has its own entry for each.
 - **Your own zikir and groups:** set a count or no limit, add Arabic text, transliteration and meaning, order the steps of a group, and delete anything you don't want. Built-in ones are hidden rather than lost, and "Restore removed zikir" brings them back.
 - Undo, start over, finish a round by hand, optional sound and vibration, and keep-the-screen-on. An unfinished round is waiting for you when you come back.
+- **Goals, streaks and a year calendar:** a daily goal per zikir or group, current and longest streak, a 7-day chart, and a full-year calendar with the Hijri date; tap a day to see what you counted and which rounds you finished.
 
 ### Your library
 - Favorite reciters and surahs, playlists (create, rename, reorder, play all), and listening history.
-- **Stats**: time listened, surahs completed, current and longest streak, top reciters and a 7-day chart.
+- **Stats**: time listened, surahs completed, current and longest streak, top reciters, a 7-day chart and a **full-year listening calendar**. Tap a day to see its Hijri date and every surah you listened to, with reciter, start time and length (kept for about a year).
+- **Ayah bookmarks and notes:** bookmark any ayah in Live Quran, add a note for memorizing or reflection, and find them all under Library → Bookmarks, ready to play again.
+- **Reminders:** morning and evening zikir, and a daily listening goal. Notifications appear while the app is open or running in the background; one you miss waits on Home until you've done it.
 - **Backup**: export, import or reset all local data as JSON.
 
 ### Cloud sync (optional)
-- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a random key in your browser, eight easy-to-write words like `apple-river-…` (88 bits, so it can't be guessed), and the cloud keeps one copy of your progress, zikir, stats and library under a hash of that key. The key itself is never stored on the server.
+- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a random key in your browser, a short story such as *7 quiet golden camels slowly stroll past the sunny river at dawn* (about 65 bits, so it can't be guessed; older eight-word keys keep working), and the cloud keeps one copy of your progress, zikir, stats and library under a hash of that key. The key itself is never stored on the server.
 - **Sync now** pulls the cloud copy, merges it with this device (progress heard on either device counts, zikir counted on two devices adds up, deleted zikir stay deleted) and saves the result in both places, so one device never overwrites another.
 - **Restore from key** brings your data to another device or after clearing the browser. **Delete my cloud data** removes the cloud copy and leaves the data on your device alone.
 - Anyone who has your key can read and change your cloud copy, and a lost key can't be recovered, so keep it safe. The JSON backup stays as a second safety net.
-- Known limit: removing a favorite or deleting a playlist on one device doesn't propagate yet; the item can come back on the next sync from another device.
+- Removing a favorite, deleting a playlist, removing a bookmark or a zikir all carry over to your other devices.
+- **Save key as file** keeps a copy of your key with instructions.
 - Sync is off unless the server has a database configured (see Environment).
 
 ### Offline and installable
