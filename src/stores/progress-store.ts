@@ -26,6 +26,9 @@ export type SurahLifetime = {
 
 export type KhatmRound = { number: number; startedAt: number; finishedAt: number; seconds: number };
 
+/** A target date for finishing the current round; null once removed, kept with its time so a sync can tell removed from never set. */
+export type KhatmPlan = { finishBy: string | null; updatedAt: number };
+
 export type ProgressSnapshot = {
   /** What was heard in the current round, one encoded string per surah. */
   slices: Record<number, string>;
@@ -39,6 +42,7 @@ export type ProgressSnapshot = {
   paceSeconds: number;
   paceAyahs: number;
   legacyImportedAt: number | null;
+  plan?: KhatmPlan;
 };
 
 type ProgressData = ProgressSnapshot;
@@ -46,6 +50,7 @@ type ProgressData = ProgressSnapshot;
 type ProgressState = ProgressData & {
   applyPlayback: (batch: PlaybackBatch, now?: number) => void;
   importLegacy: (input: LegacyInput, now?: number) => void;
+  setPlan: (finishBy: string | null, now?: number) => void;
   reset: (now?: number) => void;
   /** Replaces everything with a saved snapshot; with none, starts empty so earlier listening can be imported again. */
   restore: (snapshot: ProgressSnapshot | null, now?: number) => void;
@@ -147,7 +152,9 @@ export const useProgressStore = create<ProgressState>()(
           return settleRound(data, now);
         }),
 
-      reset: (now = Date.now()) => set({ ...EMPTY, legacyImportedAt: now }),
+      setPlan: (finishBy, now = Date.now()) => set({ plan: { finishBy, updatedAt: now } }),
+
+      reset: (now = Date.now()) => set({ ...EMPTY, legacyImportedAt: now, plan: undefined }),
 
       restore: (snapshot, now = Date.now()) => set(snapshot ? { ...snapshot, legacyImportedAt: snapshot.legacyImportedAt ?? now } : { ...EMPTY }),
     }),

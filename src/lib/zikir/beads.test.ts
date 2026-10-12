@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BEAD_COUNT, activeBead, beadStep, litTicks, ringOffset, shouldSnap } from "./beads";
+import { BEAD_COUNT, MAX_BEADS, activeBead, beadRadius, beadStep, beadsFor, litTicks, ringOffset, shouldSnap } from "./beads";
 
 describe("bead loop", () => {
   it("spaces beads evenly around the loop", () => {
@@ -46,5 +46,39 @@ describe("litTicks", () => {
 
   it("lights nothing when there is no limit", () => {
     expect(litTicks(null, 60)).toBe(0);
+  });
+});
+
+describe("beadsFor", () => {
+  it("puts one bead on the string per count of the target, up to 100", () => {
+    expect(beadsFor(1)).toBe(1);
+    expect(beadsFor(3)).toBe(3);
+    expect(beadsFor(33)).toBe(33);
+    expect(beadsFor(99)).toBe(99);
+    expect(beadsFor(100)).toBe(100);
+  });
+
+  it("uses the longest string for bigger or unlimited targets", () => {
+    expect(beadsFor(101)).toBe(MAX_BEADS);
+    expect(beadsFor(1000)).toBe(MAX_BEADS);
+    expect(beadsFor(null)).toBe(MAX_BEADS);
+  });
+
+  it("goes round once per round when the string matches the target", () => {
+    expect(ringOffset(7, beadsFor(7)) - ringOffset(0, beadsFor(7))).toBeCloseTo(Math.PI * 2, 9);
+    expect(activeBead(7, 7)).toBe(0);
+  });
+});
+
+describe("beadRadius", () => {
+  it("keeps neighbouring beads apart on every string length", () => {
+    for (let beads = 1; beads <= MAX_BEADS; beads += 1) {
+      const gap = (2 * Math.PI * 2.9) / beads;
+      expect(2 * beadRadius(beads, 2.9)).toBeLessThan(gap);
+    }
+  });
+
+  it("does not let beads on a short string grow without bound", () => {
+    expect(beadRadius(1, 2.9)).toBe(beadRadius(3, 2.9));
   });
 });

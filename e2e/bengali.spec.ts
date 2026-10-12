@@ -50,3 +50,16 @@ test("shows no NaN on the zikir stats and history tabs in Bengali", async ({ pag
   await expect(page.getByRole("tab").nth(2)).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText(/৩৩ বার/)).toBeVisible();
 });
+
+test("shows the morning and evening adhkar in Bengali, with no English left in the Hisnul Muslim cards", async ({ page }) => {
+  await page.context().addCookies([{ name: "NEXT_LOCALE", value: "bn", url: "http://localhost:3100" }]);
+  await page.goto("/zikir");
+  await expect(page.getByRole("heading", { name: "সকালের জিকির" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "সন্ধ্যার জিকির" })).toBeVisible();
+  const hisn = page.getByRole("region", { name: "হিসনুল মুসলিম" });
+  await expect(hisn.getByRole("heading", { name: "আয়াতুল কুরসি" })).toBeVisible();
+  const text = await hisn.innerText();
+  const latin = text.split("\n").filter((line) => /[A-Za-z]/.test(line));
+  expect(latin).toEqual([]);
+  await expect(page.locator("body")).not.toContainText("NaN");
+});

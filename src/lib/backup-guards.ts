@@ -1,5 +1,7 @@
 import type { LibraryData, StatsData } from "./sync/types";
 import type { ProgressSnapshot } from "@/stores/progress-store";
+import { NOTE_LIMIT, bookmarkKey, type Bookmark } from "@/stores/bookmark-store";
+import type { ListeningSession } from "@/stores/session-store";
 import type { ZikirSnapshot } from "@/stores/zikir-store";
 import { decodeSlices } from "./progress/slices";
 import type { Track } from "./types";
@@ -49,7 +51,8 @@ export const isLibrary: Guard<LibraryData> = (value): value is LibraryData =>
   arrayOf((r): r is LibraryData["favoriteReciters"][number] => isRecord(r) && isNumber(r.id) && isString(r.name))(value.favoriteReciters) &&
   arrayOf(isSurah)(value.favoriteSurahs) &&
   arrayOf(isPlaylist)(value.playlists) &&
-  arrayOf((h): h is LibraryData["history"][number] => isRecord(h) && isTrack(h.track) && isNumber(h.playedAt))(value.history);
+  arrayOf((h): h is LibraryData["history"][number] => isRecord(h) && isTrack(h.track) && isNumber(h.playedAt))(value.history) &&
+  (value.marks === undefined || recordOf((m): m is { on: boolean; at: number } => isRecord(m) && isBoolean(m.on) && isNumber(m.at))(value.marks));
 
 export const isStats: Guard<StatsData> = (value): value is StatsData =>
   isRecord(value) &&
@@ -61,6 +64,7 @@ export const isStats: Guard<StatsData> = (value): value is StatsData =>
       isRecord(c) && isSurah(c.surah) && isNumber(c.reciterId) && isNumber(c.count) && isNumber(c.lastAt),
   )(value.completed);
 
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
 export const isNonNegative: Guard<number> = (value): value is number => isNumber(value) && value >= 0;
 export const isCount: Guard<number> = (value): value is number => isNonNegative(value) && Number.isInteger(value);
 export const isNullableTime = (value: unknown): value is number | null => value === null || isNumber(value);
@@ -93,9 +97,10 @@ export const isProgress: Guard<ProgressSnapshot> = (value): value is ProgressSna
   isNonNegative(value.roundSeconds) &&
   isNonNegative(value.paceSeconds) &&
   isNonNegative(value.paceAyahs) &&
-  isNullableTime(value.legacyImportedAt);
+  isNullableTime(value.legacyImportedAt) &&
+  (value.plan === undefined ||
+    (isRecord(value.plan) && (value.plan.finishBy === null || (isString(value.plan.finishBy) && DAY_KEY.test(value.plan.finishBy))) && isNumber(value.plan.updatedAt)));
 
-const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
 const isPositiveCount: Guard<number> = (value): value is number => isCount(value) && value >= 1;
 const isOptionalCount = (value: unknown): value is number | null => value === null || isPositiveCount(value);
 
@@ -147,3 +152,34 @@ export const isZikir: Guard<ZikirSnapshot> = (value): value is ZikirSnapshot =>
   arrayOf(isZikirHistory)(value.history) &&
   recordOf((entry): entry is { removed: boolean; at: number } => isRecord(entry) && isBoolean(entry.removed) && isNumber(entry.at))(value.builtIns);
 
+
+export const isSessions: Guard<ListeningSession[]> = arrayOf(
+  (value): value is ListeningSession =>
+    isRecord(value) &&
+    isString(value.id) &&
+    isString(value.day) &&
+    DAY_KEY.test(value.day) &&
+    isNumber(value.startedAt) &&
+    isNumber(value.updatedAt) &&
+    isSurah(value.surah) &&
+    isNumber(value.reciterId) &&
+    isString(value.reciterName) &&
+    isNumber(value.moshafId) &&
+    isNonNegative(value.seconds),
+);
+
+export const isBookmarks: Guard<Record<string, Bookmark>> = (value): value is Record<string, Bookmark> =>
+  isRecord(value) &&
+  Object.entries(value).every(
+    ([key, bookmark]) =>
+      isRecord(bookmark) &&
+      isSurah(bookmark.surah) &&
+      isCount(bookmark.ayah) &&
+      bookmark.ayah >= 1 &&
+      key === bookmarkKey(bookmark.surah, bookmark.ayah) &&
+      isString(bookmark.note) &&
+      bookmark.note.length <= NOTE_LIMIT &&
+      isNumber(bookmark.createdAt) &&
+      isNumber(bookmark.updatedAt) &&
+      isNullableTime(bookmark.deletedAt),
+  );

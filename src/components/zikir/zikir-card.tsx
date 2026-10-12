@@ -30,7 +30,7 @@ export function ZikirCard({ kind, view, onEdit, onDuplicate, onDelete }: Props) 
   const arabic = isGroup ? "" : view.arabic;
 
   return (
-    <li className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
+    <li className="flex min-w-0 flex-col gap-3 rounded-2xl border bg-card p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-1.5">
           <h3 className="truncate font-semibold">{view.name}</h3>

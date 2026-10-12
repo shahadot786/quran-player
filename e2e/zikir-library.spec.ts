@@ -17,14 +17,30 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Zikir", level: 1 })).toBeVisible();
 });
 
-test("lists the built-in groups and zikir, and keeps unconfirmed ones hidden", async ({ page }) => {
+test("lists the built-in groups and zikir, with the Hisnul Muslim ones under their own heading", async ({ page }) => {
   await expect(card(page, "After salah")).toContainText("3 steps · 100 counts");
   await expect(card(page, "Istighfar and salawat")).toBeVisible();
   await expect(card(page, "SubhanAllah")).toContainText("33 counts");
   await expect(card(page, "SubhanAllah").getByText("سُبْحَانَ اللَّهِ")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Morning adhkar" })).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Ayat al-Kursi" })).toHaveCount(0);
   await expect(card(page, "SubhanAllah").getByRole("button", { name: "Options for SubhanAllah" })).toBeVisible();
+
+  await expect(card(page, "Morning adhkar")).toContainText("25 steps");
+  await expect(card(page, "Evening adhkar")).toContainText("24 steps");
+  const hisn = page.getByRole("region", { name: "Hisnul Muslim" });
+  await expect(hisn.getByRole("heading", { name: "Ayat al-Kursi" })).toBeVisible();
+  await expect(hisn.getByRole("heading", { name: "Sayyid al-Istighfar" })).toBeVisible();
+  await expect(hisn.getByRole("heading", { name: "Amsayna wa amsal-mulku lillah", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ayat al-Kursi" })).toHaveCount(1);
+});
+
+test("runs the morning adhkar step by step, starting with Hisnul Muslim 75a", async ({ page }) => {
+  await card(page, "Morning adhkar").getByRole("link", { name: "Count" }).click();
+  await expect(page.getByText("Step 1 of 25")).toBeVisible();
+  await expect(page.getByText("Alhamdulillahi wahdah").first()).toBeVisible();
+  await page.getByRole("button", { name: "Simple" }).click();
+  await page.getByRole("button", { name: /^Count/ }).click();
+  await expect(page.getByText("Step 2 of 25")).toBeVisible();
+  await expect(page.getByText("Ayat al-Kursi").first()).toBeVisible();
 });
 
 test("creates a zikir that stays after a reload", async ({ page }) => {

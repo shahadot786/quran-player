@@ -1,9 +1,11 @@
 import { trackKey } from "@/lib/audio-url";
 import { decodeSlices, emptySlices, encodeSlices, unionSlices } from "@/lib/progress/slices";
-import { HISTORY_LIMIT as PLAYS_LIMIT } from "@/stores/library-store";
+import { HISTORY_LIMIT as PLAYS_LIMIT, markKey } from "@/stores/library-store";
 import type { ProgressSnapshot, SurahLifetime } from "@/stores/progress-store";
+import type { ListeningSession } from "@/stores/session-store";
 import { HISTORY_LIMIT as ROUNDS_LIMIT, type ZikirSnapshot } from "@/stores/zikir-store";
 import type { Counts } from "@/lib/zikir/types";
+import { SYNC_SESSION_LIMIT } from "./limits";
 import type { LibraryData, StatsData, SyncSnapshot } from "./types";
 
 // Every merger below gives the same result whatever order the two sides come in, so two devices end up identical.
@@ -51,13 +53,19 @@ function mergeLibrary(a: LibraryData, b: LibraryData): LibraryData {
   const history = unionBy(a.history, b.history, (h) => trackKey(h.track), (x, y) => pick(x, y, (h) => h.playedAt))
     .sort((x, y) => y.playedAt - x.playedAt || byText(trackKey(x.track), trackKey(y.track)))
     .slice(0, PLAYS_LIMIT);
+  const marks = mergeKeyed(a.marks ?? {}, b.marks ?? {}, (x, y) => pick(x, y, (entry) => entry.at));
+  // Union first, then drop whatever was last removed on either device.
+  const kept = (key: string) => marks[key]?.on !== false;
   return {
-    favoriteReciters: unionBy(a.favoriteReciters, b.favoriteReciters, (r) => String(r.id), (x, y) => pick(x, y, () => 0)).sort((x, y) => x.id - y.id),
-    favoriteSurahs: [...new Set([...a.favoriteSurahs, ...b.favoriteSurahs])].sort((x, y) => x - y),
-    playlists: unionBy(a.playlists, b.playlists, (p) => p.id, (x, y) => pick(x, y, (p) => p.updatedAt)).sort(
-      (x, y) => x.createdAt - y.createdAt || byText(x.id, y.id),
-    ),
+    favoriteReciters: unionBy(a.favoriteReciters, b.favoriteReciters, (r) => String(r.id), (x, y) => pick(x, y, () => 0))
+      .filter((r) => kept(markKey.reciter(r.id)))
+      .sort((x, y) => x.id - y.id),
+    favoriteSurahs: [...new Set([...a.favoriteSurahs, ...b.favoriteSurahs])].filter((surah) => kept(markKey.surah(surah))).sort((x, y) => x - y),
+    playlists: unionBy(a.playlists, b.playlists, (p) => p.id, (x, y) => pick(x, y, (p) => p.updatedAt))
+      .filter((p) => kept(markKey.playlist(p.id)))
+      .sort((x, y) => x.createdAt - y.createdAt || byText(x.id, y.id)),
     history,
+    ...(a.marks || b.marks ? { marks } : {}),
   };
 }
 
@@ -118,6 +126,7 @@ function mergeProgress(a: ProgressSnapshot, b: ProgressSnapshot): ProgressSnapsh
     paceSeconds: bigger(a.paceSeconds, b.paceSeconds),
     paceAyahs: bigger(a.paceAyahs, b.paceAyahs),
     legacyImportedAt: biggerOrNull(a.legacyImportedAt, b.legacyImportedAt),
+    ...(a.plan || b.plan ? { plan: a.plan && b.plan ? pick(a.plan, b.plan, (plan) => plan.updatedAt) : (a.plan ?? b.plan)! } : {}),
   };
 }
 
@@ -141,12 +150,31 @@ function mergeZikir(a: ZikirSnapshot, b: ZikirSnapshot): ZikirSnapshot {
   };
 }
 
+const SYNC_SESSION_MS = 90 * 24 * 60 * 60 * 1000;
+const newestFirst = (x: ListeningSession, y: ListeningSession) => y.startedAt - x.startedAt || byText(x.id, y.id);
+
+/** Every session from both sides once, keeping the longer copy of a session that both have. */
+export function unionSessions(a: ListeningSession[], b: ListeningSession[]): ListeningSession[] {
+  return unionBy(a, b, (session) => session.id, (x, y) => pick(x, y, (session) => session.seconds)).sort(newestFirst);
+}
+
+// The cloud keeps only the recent log. The window is measured from the newest session, not the clock, so every device cuts it the same way.
+export function syncWindow(sessions: ListeningSession[]): ListeningSession[] {
+  const newest = sessions[0]?.startedAt ?? 0;
+  return sessions.filter((session) => session.startedAt >= newest - SYNC_SESSION_MS).slice(0, SYNC_SESSION_LIMIT);
+}
+
 export function mergeSnapshots(a: SyncSnapshot, b: SyncSnapshot): SyncSnapshot {
-  return {
+  const merged: SyncSnapshot = {
     library: mergeLibrary(a.library, b.library),
     stats: mergeStats(a.stats, b.stats),
     progress: mergeProgress(a.progress, b.progress),
     zikir: mergeZikir(a.zikir, b.zikir),
+  };
+  return {
+    ...merged,
+    ...(a.sessions || b.sessions ? { sessions: syncWindow(unionSessions(a.sessions ?? [], b.sessions ?? [])) } : {}),
+    ...(a.bookmarks || b.bookmarks ? { bookmarks: mergeKeyed(a.bookmarks ?? {}, b.bookmarks ?? {}, (x, y) => pick(x, y, (bookmark) => bookmark.updatedAt)) } : {}),
   };
 }
 

@@ -40,7 +40,7 @@ export function ZikirHome() {
     return (
       <div role="status" aria-label={common("loading")} className="flex flex-col gap-4">
         <Skeleton className="h-24 rounded-2xl" />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }, (_, i) => (
             <Skeleton key={i} className="h-48 rounded-2xl" />
           ))}
@@ -116,7 +116,7 @@ export function ZikirHome() {
         <h2 id="zikir-groups-heading" className="text-lg font-semibold">
           {t("sections.groups")}
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {groups.map((view) => (
             <ZikirCard key={view.id} kind="group" view={view} onEdit={() => setEditing({ kind: "group", view })} onDuplicate={() => duplicateGroup(view)} onDelete={() => setDeleting({ kind: "group", view })} />
           ))}
@@ -127,12 +127,28 @@ export function ZikirHome() {
         <h2 id="zikir-items-heading" className="text-lg font-semibold">
           {t("sections.items")}
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((view) => (
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {items.filter((view) => view.collection !== "hisn").map((view) => (
             <ZikirCard key={view.id} kind="item" view={view} onEdit={() => setEditing({ kind: "item", view })} onDuplicate={() => duplicateItem(view)} onDelete={() => setDeleting({ kind: "item", view })} />
           ))}
         </ul>
       </section>
+
+      {items.some((view) => view.collection === "hisn") && (
+        <section aria-labelledby="zikir-hisn-heading" className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 id="zikir-hisn-heading" className="text-lg font-semibold">
+              {t("sections.hisn")}
+            </h2>
+            <p className="max-w-prose text-sm text-muted-foreground">{t("sections.hisnDescription")}</p>
+          </div>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {items.filter((view) => view.collection === "hisn").map((view) => (
+              <ZikirCard key={view.id} kind="item" view={view} onEdit={() => setEditing({ kind: "item", view })} onDuplicate={() => duplicateItem(view)} onDelete={() => setDeleting({ kind: "item", view })} />
+            ))}
+          </ul>
+        </section>
+      )}
       </TabsContent>
 
       <TabsContent value="stats">

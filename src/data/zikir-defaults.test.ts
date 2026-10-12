@@ -62,9 +62,72 @@ describe("built-in zikir", () => {
     ]);
   });
 
-  it("keeps the morning and evening adhkar hidden until they are confirmed", () => {
-    expect(getBuiltInGroup("builtin:morningAdhkar")!.reviewed).toBe(false);
-    expect(getBuiltInGroup("builtin:eveningAdhkar")!.reviewed).toBe(false);
-    expect(visibleBuiltInGroups().map((group) => group.key)).toEqual(["afterSalah", "istighfarSalawat"]);
+  it("shows every built-in item and group now that all of them are confirmed", () => {
+    expect(BUILT_IN_ITEMS.every((item) => item.reviewed)).toBe(true);
+    expect(BUILT_IN_GROUPS.every((group) => group.reviewed)).toBe(true);
+    expect(visibleBuiltInGroups().map((group) => group.key)).toEqual(["afterSalah", "istighfarSalawat", "morningAdhkar", "eveningAdhkar"]);
+    expect(visibleBuiltInItems()).toHaveLength(BUILT_IN_ITEMS.length);
+  });
+
+  it("builds the morning and evening groups from Hisnul Muslim in the book's order", () => {
+    const keys = (id: string) => getBuiltInGroup(id)!.steps.map((step) => getBuiltInItem(step.itemId)!.key);
+    const morning = keys("builtin:morningAdhkar");
+    const evening = keys("builtin:eveningAdhkar");
+    expect(morning.slice(0, 5)).toEqual(["hisn75a", "ayatAlKursi", "ikhlas", "falaq", "nas"]);
+    expect(evening.slice(0, 5)).toEqual(morning.slice(0, 5));
+    expect(morning.at(-1)).toBe("hisn98");
+    expect(evening.at(-1)).toBe("hisn98");
+  });
+
+  it("keeps morning-only and evening-only wording out of the other group", () => {
+    const keys = (id: string) => getBuiltInGroup(id)!.steps.map((step) => getBuiltInItem(step.itemId)!.key);
+    const morning = keys("builtin:morningAdhkar");
+    const evening = keys("builtin:eveningAdhkar");
+    expect(morning.filter((key) => /e$/.test(key) && key.startsWith("hisn"))).toEqual([]);
+    for (const key of ["hisn77e", "hisn78e", "hisn80e", "hisn81e", "hisn89e", "hisn90e", "audhuKalimat"]) {
+      expect(morning, key).not.toContain(key);
+      expect(evening, key).toContain(key);
+    }
+    for (const key of ["hisn77", "hisn78", "hisn80", "hisn81", "hisn89", "hisn90", "hisn94", "hisn95"]) {
+      expect(evening, key).not.toContain(key);
+      expect(morning, key).toContain(key);
+    }
+  });
+
+  it("keeps the counts the book gives", () => {
+    const target = (key: string) => getBuiltInItem(`builtin:${key}`)!.target;
+    expect(target("hisn80")).toBe(4);
+    expect(target("hisn82")).toBe(3);
+    expect(target("hisn83")).toBe(7);
+    expect(target("hisn86")).toBe(3);
+    expect(target("hisn87")).toBe(3);
+    expect(target("hisn94")).toBe(3);
+    expect(target("hisn96")).toBe(100);
+    expect(target("hisn98")).toBe(10);
+  });
+
+  it("has transliteration in both languages for every Hisnul Muslim item", () => {
+    for (const messages of [en, bn]) {
+      for (const item of BUILT_IN_ITEMS.filter((entry) => entry.collection === "hisn" && entry.key.startsWith("hisn"))) {
+        const text = (messages.zikir.items as Record<string, Record<string, string>>)[item.key];
+        expect(text?.transliteration?.trim(), item.key).toBeTruthy();
+      }
+    }
+  });
+
+  it("writes the Bengali in Bengali script, without Latin letters", () => {
+    for (const item of BUILT_IN_ITEMS.filter((entry) => entry.key.startsWith("hisn"))) {
+      const text = (bn.zikir.items as Record<string, Record<string, string>>)[item.key]!;
+      for (const field of ["name", "transliteration", "meaning"]) expect(text[field], `${item.key}.${field}`).not.toMatch(/[A-Za-z]/);
+    }
+  });
+
+  // The Quranic items use the Uthmani spelling as published, which keeps a tatweel inside some words, so only the copied Hisnul Muslim text is held to this.
+  it("carries no stray tatweel, invisible marks or doubled diacritics in the Hisnul Muslim Arabic", () => {
+    for (const item of BUILT_IN_ITEMS.filter((entry) => entry.key.startsWith("hisn"))) {
+      expect(item.arabic, item.id).not.toMatch(/[\u0640\u200f\u200e]/);
+      expect(item.arabic, item.id).not.toMatch(/([\u064b-\u0652])\1/);
+      expect(item.arabic, item.id).not.toMatch(/\s[\u064b-\u0652]/);
+    }
   });
 });

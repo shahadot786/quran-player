@@ -14,5 +14,14 @@ export type SceneController = {
   dispose?: () => void;
 };
 
-export type SceneContext = { THREE: Three; scene: ThreeNamespace.Scene; camera: ThreeNamespace.PerspectiveCamera; dark: boolean };
+export type SceneContext = {
+  THREE: Three;
+  scene: ThreeNamespace.Scene;
+  camera: ThreeNamespace.PerspectiveCamera;
+  dark: boolean;
+  /** Beads on the string, or ticks on the dial. */
+  beads: number;
+  /** Moves jump straight to where they end and nothing pulses. */
+  still: boolean;
+};
 export type SceneBuilder = (context: SceneContext) => SceneController;

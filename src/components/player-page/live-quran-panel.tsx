@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Check, Copy, Minus, Play, Plus, RefreshCw } from "lucide-react";
+import { Bookmark, BookmarkCheck, Check, Copy, Minus, NotebookPen, Play, Plus, RefreshCw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { NoteDialog } from "@/components/bookmarks/note-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +14,7 @@ import { getLocalizedSurahName, toBengaliDigits } from "@/lib/bengali-data";
 import { BISMILLAH_ARABIC, getSurahText, type SurahText } from "@/lib/quran-text";
 import { getSurah } from "@/lib/surahs";
 import { cn } from "@/lib/utils";
+import { bookmarkKey, isLive, useAyahFocus, useBookmarkStore } from "@/stores/bookmark-store";
 import { selectCurrentTrack, usePlayerStore } from "@/stores/player-store";
 
 const FONT_SIZES = [
@@ -68,6 +70,9 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
   const bismillahRef = useRef<HTMLDivElement>(null);
   const userScrolledAt = useRef(0);
   const previousActive = useRef<number | null>(null);
+  const bookmarks = useBookmarkStore((s) => s.bookmarks);
+  const focus = useAyahFocus();
+  const [noteFor, setNoteFor] = useState<{ surah: number; ayah: number; title: string } | null>(null);
 
   const playing = currentTrack && currentTrack.surah === activeSurahId ? currentTrack : undefined;
   const sync = useAyahSync(playing);
@@ -107,6 +112,17 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     centerInView(element, reduced ? "auto" : "smooth");
   }, [active, follow, data]);
+
+  // An ayah opened from the bookmarks list is brought into view once its surah's text is here.
+  useEffect(() => {
+    if (!focus || focus.surah !== activeSurahId || loadedSurahId !== activeSurahId) return;
+    const element = listRef.current?.querySelector<HTMLElement>(`[data-ayah="${focus.ayah}"]`);
+    if (!element) return;
+    userScrolledAt.current = Date.now();
+    centerInView(element, "auto");
+    element.focus({ preventScroll: true });
+    useAyahFocus.setState(null, true);
+  }, [focus, activeSurahId, loadedSurahId, data]);
 
   useEffect(() => {
     const markScrolled = () => {
@@ -312,11 +328,15 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
               const isCopied = copiedAyah === ayah.numberInSurah;
               const isActive = active === ayah.numberInSurah;
               const timing = sync.timings?.ayahs.find((entry) => entry.ayah === ayah.numberInSurah);
+              const saved = bookmarks[bookmarkKey(activeSurahId, ayah.numberInSurah)];
+              const bookmarked = isLive(saved);
+              const place = t("bookmarks.place", { surah: localizedSurahName ?? "", ayah: ayahNumFormatted });
 
               return (
                 <li
                   key={ayah.numberInSurah}
                   data-ayah={ayah.numberInSurah}
+                  tabIndex={-1}
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
                     "group relative flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/20",
@@ -344,6 +364,25 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
                     <Button
                       variant="ghost"
                       size="icon-xs"
+                      aria-pressed={bookmarked}
+                      onClick={() => useBookmarkStore.getState().toggle(activeSurahId, ayah.numberInSurah)}
+                      aria-label={t("bookmarks.toggle", { place })}
+                      title={bookmarked ? t("bookmarks.remove") : t("bookmarks.add")}
+                    >
+                      {bookmarked ? <BookmarkCheck className="size-3 text-primary" /> : <Bookmark className="size-3" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => setNoteFor({ surah: activeSurahId, ayah: ayah.numberInSurah, title: place })}
+                      aria-label={t("bookmarks.noteFor", { place })}
+                      title={t("bookmarks.note")}
+                    >
+                      <NotebookPen className="size-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
                       onClick={() => handleCopyAyah(ayah.numberInSurah, ayah.arabic, ayah.bengali)}
                       className="opacity-60 group-hover:opacity-100 transition-opacity"
                       aria-label={t("playerPage.liveQuran.copyAyah")}
@@ -363,6 +402,13 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
                     {ayah.arabic}
                   </div>
 
+                  {bookmarked && saved!.note && (
+                    <p className="rounded-lg bg-muted px-3 py-2 text-sm whitespace-pre-line">
+                      <span className="sr-only">{t("bookmarks.noteLabel")}: </span>
+                      {saved!.note}
+                    </p>
+                  )}
+
                   {/* Bengali Translation */}
                   {showBengali && ayah.bengali && (
                     <div className="border-t border-border/40 pt-2 text-left">
@@ -377,6 +423,7 @@ export function LiveQuranPanel({ surahId: propSurahId }: { surahId?: number }) {
           </ul>
         </div>
       )}
+      <NoteDialog target={noteFor} onClose={() => setNoteFor(null)} />
     </div>
   );
 }

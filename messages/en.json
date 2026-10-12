@@ -52,7 +52,24 @@
     "featured": "Well-loved reciters",
     "seeAll": "See all",
     "resumeAt": "Resume at {time}",
-    "left": "{time} left"
+    "left": "{time} left",
+    "today": {
+      "quran": "Quran progress",
+      "surahs": "{done} of 114 surahs",
+      "quranLabel": "{percent}% of the Quran heard",
+      "heard": "Heard",
+      "listenedToday": "Listened today",
+      "streak": "Streak",
+      "zikirToday": "Zikir today",
+      "planParas": "Khatm plan: about {paras} paras a day, {days} days left",
+      "planTime": "Khatm plan: about {paras} paras ({time}) a day, {days} days left",
+      "planStart": "Plan a khatm",
+      "planReview": "See your khatm plan",
+      "syncNever": "Your progress is only on this device.",
+      "syncStale": "{count, plural, one {Last synced # day ago.} other {Last synced # days ago.}}",
+      "syncNow": "Sync now",
+      "syncDismiss": "Not now"
+    }
   },
   "reciters": {
     "title": "Reciters",
@@ -166,7 +183,8 @@
       "favorites": "Favorites",
       "playlists": "Playlists",
       "history": "History",
-      "downloads": "Downloads"
+      "downloads": "Downloads",
+      "bookmarks": "Bookmarks"
     },
     "favoriteReciters": "Reciters",
     "favoriteSurahs": "Surahs",
@@ -241,7 +259,14 @@
     "topReciters": "Most listened reciters",
     "noData": "Start a surah and your listening time will show up here.",
     "hours": "{hours} h {minutes} min",
-    "mins": "{minutes} min"
+    "mins": "{minutes} min",
+    "calendar": {
+      "title": "Listening calendar",
+      "description": "Every day of the year you listened. Tap a day to see what you heard.",
+      "none": "You didn’t listen on this day.",
+      "onlyTotal": "Only the total time is known for this day. A detailed list is kept for listening from now on.",
+      "sessions": "What you listened to"
+    }
   },
   "data": {
     "title": "Your data",
@@ -427,6 +452,26 @@
       "view": "View full progress",
       "empty": "Start a surah and your progress will show here.",
       "strip": "Progress across the 114 surahs"
+    },
+    "plan": {
+      "title": "Khatm plan",
+      "description": "Pick a day to finish this round, and see how much to listen to each day.",
+      "finishBy": "Finish by {date}",
+      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+      "perDay": "About {paras} paras a day",
+      "ayahsPerDay": "{ayahs} ayahs a day",
+      "ayahsAndTime": "{ayahs} ayahs, about {time} of listening a day",
+      "today": "Today: {done} of {goal}",
+      "todayLabel": "Today’s listening toward the plan",
+      "done": "Alhamdulillah, this round is finished.",
+      "overdue": "The finish date has passed with {ayahs} ayahs still to go. Pick a new date.",
+      "change": "Change date",
+      "remove": "Remove plan",
+      "inDays": "In 30 days",
+      "byRamadan": "By the end of Ramadan ({date})",
+      "pick": "Or pick a date",
+      "set": "Set plan",
+      "cancel": "Cancel"
     }
   },
   "zikir": {
@@ -496,6 +541,131 @@
         "name": "A'udhu bikalimatillahit-tammati",
         "transliteration": "A'udhu bikalimatillahit-tammati min sharri ma khalaq",
         "meaning": "I seek refuge in the perfect words of Allah from the evil of what He created"
+      },
+      "hisn75a": {
+        "name": "Alhamdulillahi wahdah",
+        "transliteration": "Alhamdulillahi wahdah was-salatu was-salam 'ala man la nabiyya ba'dah.",
+        "meaning": "All praise is due to Allah alone, and peace and blessings be upon him after whom there is no other Prophet."
+      },
+      "hisn77": {
+        "name": "Asbahna wa asbahal-mulku lillah",
+        "transliteration": "Asbahna wa asbahal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in Qadir. Rabbi as'aluka khayra ma fi hadha 'l-yawmi wa khayra ma ba'dahu wa a'udhu bika min sharri ma fi hatha 'l-yawmi wa sharri ma ba'dahu, Rabbi a'udhu bika minal-kasali, wa su'il-kibar, Rabbi a'udhu bika min 'adhabin fin-nari wa 'adhabin fil-qabr.",
+        "meaning": "We have entered a new day and with it all dominion is Allah's. Praise is to Allah. None has the right to be worshipped but Allah alone, Who has no partner. To Allah belongs the dominion, and to Him is the praise and He is Able to do all things. My Lord, I ask You for the goodness of this day and of the days that come after it, and I seek refuge in You from the evil of this day and of the days that come after it. My Lord, I seek refuge in You from laziness and helpless old age. My Lord, I seek refuge in You from the punishment of Hell-fire, and from the punishment of the grave."
+      },
+      "hisn77e": {
+        "name": "Amsayna wa amsal-mulku lillah",
+        "transliteration": "Amsayna wa amsal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in Qadir. Rabbi as'aluka khayra ma fi hathihil-laylati wa khayra ma ba'daha wa a'udhu bika min sharri ma fi hathihil-laylati wa sharri ma ba'daha, Rabbi a'udhu bika minal-kasali, wa su'il-kibar, Rabbi a'udhu bika min 'adhabin fin-nari wa 'adhabin fil-qabr.",
+        "meaning": "We have ended another day and with it, all dominion is Allah's. Praise is to Allah. None has the right to be worshipped but Allah alone, Who has no partner. To Allah belongs the dominion, and to Him is the praise and He is Able to do all things. My Lord, I ask You for the goodness of this night and of the nights that come after it, and I seek refuge in You from the evil of this night and of the nights that come after it. My Lord, I seek refuge in You from laziness and helpless old age. My Lord, I seek refuge in You from the punishment of Hell-fire, and from the punishment of the grave."
+      },
+      "hisn78": {
+        "name": "Allahumma bika asbahna",
+        "transliteration": "Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namut, wa ilaykan-nushur.",
+        "meaning": "O Allah, by You we enter the morning and by You we enter the evening, by You we live and by You we die, and to You is the Final Return."
+      },
+      "hisn78e": {
+        "name": "Allahumma bika amsayna",
+        "transliteration": "Allahumma bika amsayna wa bika asbahna wa bika nahya wa bika namut wa ilaykal-masir.",
+        "meaning": "O Allah, You bring us the end of the day as You bring us its beginning, You bring us life and You bring us death, and to You is our fate."
+      },
+      "hisn79": {
+        "name": "Sayyid al-Istighfar",
+        "transliteration": "Allahumma anta Rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't, a'udhu bika min sharri ma sana't, abu'u laka bi ni'matika 'alay, wa abu'u bidhanbi faghfir li fa'innahu la yaghfirudh-dhunuba illa ant.",
+        "meaning": "O Allah, You are my Lord, there is none worthy of worship but You. You created me and I am your slave. I keep Your covenant, and my pledge to You so far as I am able. I seek refuge in You from the evil of what I have done. I admit to Your blessings upon me, and I admit to my misdeeds. Forgive me, for there is none who may forgive sins but You."
+      },
+      "hisn80": {
+        "name": "Allahumma inni asbahtu ush-hiduka",
+        "transliteration": "Allahumma inni asbahtu ush-hiduka wa ush-hidu hamalata 'arshik, wa mala'ikataka wajami'a khalqik, annaka antallahu la ilaha illa ant, wahdaka la sharika lak, wa anna Muhammadan 'abduka wa rasuluk.",
+        "meaning": "O Allah, I have entered a new morning and call upon You and upon the bearers of Your Throne, upon Your angels and all creation to bear witness that surely You are Allah, there is none worthy of worship but You alone, You have no partners, and that Muhammad is Your slave and Your Messenger."
+      },
+      "hisn80e": {
+        "name": "Allahumma inni amsaytu ush-hiduka",
+        "transliteration": "Allahumma inni amsaytu ush-hiduka wa ush-hidu hamalata 'arshik, wa mala'ikataka wajami'a khalqik, annaka antallahu la ilaha illa ant, wahdaka la sharika lak, wa anna Muhammadan 'abduka wa rasuluk.",
+        "meaning": "O Allah, I have ended another day and call upon You and upon the bearers of Your Throne, upon Your angels and all creation to bear witness that surely You are Allah, there is none worthy of worship but You alone, You have no partners, and that Muhammad is Your slave and Your Messenger."
+      },
+      "hisn81": {
+        "name": "Allahumma ma asbaha bi min ni'matin",
+        "transliteration": "Allahumma ma asbaha bi min ni'matin aw bi ahadin min khalqik, fa minka wahdaka la sharika lak, falaka 'l-hamdu wa lakash-shukr.",
+        "meaning": "O Allah, whatever blessing has been received by me or anyone of Your creation is from You alone, You have no partner. All praise is for you and thanks is to You."
+      },
+      "hisn81e": {
+        "name": "Allahumma ma amsa bi min ni'matin",
+        "transliteration": "Allahumma ma amsa bi min ni'matin aw bi ahadin min khalqik, fa minka wahdaka la sharika lak, falaka 'l-hamdu wa lakash-shukr.",
+        "meaning": "O Allah, whatever blessing has come to me this evening or anyone of Your creation is from You alone, You have no partner. All praise is for you and thanks is to You."
+      },
+      "hisn82": {
+        "name": "Allahumma 'afini fi badani",
+        "transliteration": "Allahumma 'afini fi badani, Allahumma 'afini fi sam'i, Allahumma 'afini fi basari, la ilaha illa ant. Allahumma inni a'udhu bika mina 'l-kufri, wa 'l-faqr, wa a'udhu bika min 'adhabi 'l-qabr, la ilaha illa ant.",
+        "meaning": "O Allah, make me healthy in my body. O Allah, preserve for me my hearing. O Allah, preserve for me my sight. There is none worthy of worship but You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. There is none worthy of worship but You"
+      },
+      "hisn83": {
+        "name": "Hasbiyallahu la ilaha illa huwa",
+        "transliteration": "Hasbiyallahu la ilaha illa huwa 'alayhi tawakkalt, wa huwa Rabbu 'l-'Arshi 'l-'Azim.",
+        "meaning": "Allah is sufficient for me. There is none worthy of worship but Him. I have placed my trust in Him, He is Lord of the Majestic Throne."
+      },
+      "hisn84": {
+        "name": "Allahumma inni as'alukal-'afwa wal-'afiyah",
+        "transliteration": "Allahumma inni as'aluka 'l-'afwa wal-'afiyah fid-dunya wal-akhirah, Allahumma inni as'aluka 'l-'afwa wal-'afiyah fi dini wa dunyaya, wa ahli, wa mali, Allahummastur 'awrati, wa amin raw'ati, Allahummahfazni min bayni yadayya, wa min khalfi, wa 'an yamini, wa 'an shimali, wa min fawqi, wa a'udhu bi'azamatika an 'ughtala min tahti.",
+        "meaning": "O Allah, I seek Your forgiveness and Your protection in this world and the next. O Allah, I seek Your forgiveness and Your protection in my religion, in my worldly affairs, in my family and in my wealth. O Allah, conceal my secrets and preserve me from anguish. O Allah, guard me from what is in front of me and behind me, from my left, and from my right, and from above me. I seek refuge in Your Greatness from being struck down from beneath me."
+      },
+      "hisn85": {
+        "name": "Allahumma 'alimal-ghaybi wash-shahadah",
+        "transliteration": "Allahumma 'alima 'l-ghaybi wash-shahadah fatir as-samawati wa 'l'ard, Rabba kulli shay'in wa malikah, ash-hadu an la ilaha illa ant, a'udhu bika min sharri nafsi, wa min sharrish-shaytani wa shirkih, wa an aqtarifa 'ala nafsi su'an, aw ajurrahu ila Muslim.",
+        "meaning": "O Allah, Knower of the unseen and the evident, Maker of the heavens and the earth, Lord of everything and its Possessor, I bear witness that there is none worthy of worship but You. I seek refuge in You from the evil of my soul, and from the evil of Satan and his helpers. (I seek refuge in You) from bringing evil upon my soul and from harming any Muslim."
+      },
+      "hisn86": {
+        "name": "Bismillahil-ladhi la yadurru ma'asmihi",
+        "transliteration": "Bismillahi 'l-ladhi la yadurru ma'a-smihi shay'un fil-'ardi wa la fis-sama' wa huwas-Sami 'ul-'Alim.",
+        "meaning": "In the Name of Allah, Who with His Name nothing can cause harm in the earth nor in the heavens, and He is the All-Hearing, the All-Knowing."
+      },
+      "hisn87": {
+        "name": "Raditu billahi Rabba",
+        "transliteration": "Raditu billahi Rabba, wa bil-Islami dina, wa bi-Muhammadin (sallallahu 'alayhi wa sallama) nabiyya.",
+        "meaning": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace and blessings of Allah be upon him) as my Prophet."
+      },
+      "hisn88": {
+        "name": "Ya Hayyu ya Qayyum",
+        "transliteration": "Ya Hayyu ya Qayyumu birahmatika astaghith aslih li sha'ni kullah wa la takilni ila nafsi tarfata 'ayn.",
+        "meaning": "O Ever-Living One, O Eternal One, by Your mercy I call on You to set right all my affairs. Do not place me in charge of my soul even for the blinking of an eye (i.e. a moment)."
+      },
+      "hisn89": {
+        "name": "Asbahna wa asbahal-mulku lillahi Rabbil-'alamin",
+        "transliteration": "Asbahna wa asbahal-mulku lillahi Rabbil-'alamin, Allahumma inni as'aluka khayra hadhal-yawm, fathahu, wa nasrahu, wa nurahu, wa barakatahu, wa hudah, wa a'udhu bika min sharri ma fihi wa sharri ma ba'dah.",
+        "meaning": "We have entered a new day and with it all the dominion which belongs to Allah, Lord of all that exists. O Allah, I ask You for the goodness of this day, its victory, its help, its light, its blessings, and its guidance. I seek refuge in You from the evil that is in it, and from the evil that follows it."
+      },
+      "hisn89e": {
+        "name": "Amsayna wa amsal-mulku lillahi Rabbil-'alamin",
+        "transliteration": "Amsayna wa amsal-mulku lillahi Rabbil-'alamin, Allahumma inni as'aluka khayra hadhihil-laylah, fathaha, wa nasraha, wa nuraha, wa barakataha, wa hudaha, wa a'udhu bika min sharri ma fiha wa sharri ma ba'daha.",
+        "meaning": "We have ended another day and with it all the dominion which belongs to Allah, Lord of all that exists. O Allah, I ask You for the goodness of this night, its victory, its help, its light, its blessings, and its guidance. I seek refuge in You from the evil that is in it, and from the evil that follows it."
+      },
+      "hisn90": {
+        "name": "Asbahna 'ala fitratil-Islam",
+        "transliteration": "Asbahna 'ala fitrati 'l-Islam, wa 'ala kalimati 'l-ikhlas, wa 'ala dini nabiyyina Muhammadin (sallallahu 'alayhi wa sallam), wa 'ala millati abina Ibrahim, hanifan Musliman wa ma kana mina 'l-mushrikin.",
+        "meaning": "We have entered a new day upon the natural religion of Islam, the word of sincere devotion, the religion of our Prophet Muhammad (peace and blessings of Allah be upon him), and the faith of our father Ibrahim. He was upright (in worshipping Allah), and a Muslim. He was not of those who worship others besides Allah."
+      },
+      "hisn90e": {
+        "name": "Amsayna 'ala fitratil-Islam",
+        "transliteration": "Amsayna 'ala fitrati 'l-Islam, wa 'ala kalimati 'l-ikhlas, wa 'ala dini nabiyyina Muhammadin (sallallahu 'alayhi wa sallam), wa 'ala millati abina Ibrahim, hanifan Musliman wa ma kana mina 'l-mushrikin.",
+        "meaning": "We have ended this day upon the natural religion of Islam, the word of sincere devotion, the religion of our Prophet Muhammad (peace and blessings of Allah be upon him), and the faith of our father Ibrahim. He was upright (in worshipping Allah), and a Muslim. He was not of those who worship others besides Allah."
+      },
+      "hisn94": {
+        "name": "Subhanallahi wa bihamdihi 'adada khalqihi",
+        "transliteration": "Subhanallahi wa bihamdihi, 'adada khalqihi, wa rida nafsihi, wa zinata 'arshihi, wa midada kalimatihi.",
+        "meaning": "Glory is to Allah and praise is to Him, by the multitude of His creation, by His Pleasure, by the weight of His Throne, and by the extent of His Words."
+      },
+      "hisn95": {
+        "name": "Allahumma inni as'aluka 'ilman nafi'an",
+        "transliteration": "Allahumma inni as'aluka 'ilman nafi'a, wa rizqan tayyiba, wa 'amalan mutaqabbala.",
+        "meaning": "O Allah, I ask You for knowledge that is of benefit, a good provision, and deeds that will be accepted."
+      },
+      "hisn96": {
+        "name": "Astaghfirullaha wa atubu ilayh",
+        "transliteration": "Astaghfirullaha wa atubu ilayh.",
+        "meaning": "I seek the forgiveness of Allah and repent to Him."
+      },
+      "hisn98": {
+        "name": "Allahumma salli wa sallim 'ala nabiyyina Muhammad",
+        "transliteration": "Allahumma salli wa sallim 'ala nabiyyina Muhammad.",
+        "meaning": "O Allah, send blessings and peace upon our Prophet Muhammad."
       }
     },
     "groups": {
@@ -509,11 +679,11 @@
       },
       "morningAdhkar": {
         "name": "Morning adhkar",
-        "description": "An ordered set for the morning"
+        "description": "The morning remembrance from Hisnul Muslim, in order"
       },
       "eveningAdhkar": {
         "name": "Evening adhkar",
-        "description": "An ordered set for the evening"
+        "description": "The evening remembrance from Hisnul Muslim, in order"
       }
     },
     "title": "Zikir",
@@ -523,7 +693,9 @@
     "newGroup": "New group",
     "sections": {
       "groups": "Groups",
-      "items": "Zikir"
+      "items": "Zikir",
+      "hisn": "Hisnul Muslim",
+      "hisnDescription": "The morning and evening remembrance from Hisnul Muslim, each one on its own. The morning and evening groups above run through them in order."
     },
     "emptyCustom": "Use the buttons above to make your own zikir or group.",
     "card": {
@@ -656,6 +828,12 @@
       "clearTitle": "Clear your history?",
       "clearDescription": "This removes the list of finished rounds from this device. Your daily counts stay.",
       "cleared": "History cleared"
+    },
+    "calendar": {
+      "title": "Zikir calendar",
+      "description": "Every day of the year you counted. Tap a day to see what you counted.",
+      "none": "Nothing was counted on this day.",
+      "rounds": "Rounds finished"
     }
   },
   "sync": {
@@ -675,12 +853,15 @@
       "copy": "Copy key",
       "copied": "Key copied",
       "copyError": "Couldn’t copy the key.",
-      "warning": "Anyone with these words can read and change your cloud copy. If you lose both the key and this browser’s data, the cloud copy can’t be recovered, so write the words down or keep them somewhere safe."
+      "warning": "Your key is a little story. Anyone who knows it can read and change your cloud copy. If you lose both the key and this browser’s data, the cloud copy can’t be recovered, so write it down somewhere safe.",
+      "save": "Save as file",
+      "saved": "Key saved",
+      "fileText": "Tilawah sync key\n\n{key}\n\nTo bring your progress, zikir and stats to another device, open {site}, go to Stats, choose “Restore from key” and type this sentence.\nKeep this file private: anyone with the key can read and change your cloud copy.\n"
     },
     "restore": {
       "open": "Restore from key",
       "title": "Restore from a key",
-      "description": "Type or paste the sync key from another device: eight words. Its cloud data is merged with the data on this device, and this device uses that key from now on.",
+      "description": "Type or paste the sync key from your other device, the short story such as “7 quiet golden camels…”. Its cloud data is merged with this device, and this device uses that key from now on.",
       "label": "Sync key",
       "confirm": "Restore",
       "restoring": "Restoring…",
@@ -695,7 +876,7 @@
     },
     "errors": {
       "offline": "You’re offline. Your data on this device is safe; try again when you’re connected.",
-      "invalid-key": "That isn’t a valid sync key. A key is eight words, like “apple-river-…”, and every word must be spelled correctly.",
+      "invalid-key": "That isn’t a valid sync key. Check that every word is spelled as shown, in the same order.",
       "rate-limited": "Too many requests. Try again in a few minutes.",
       "too-large": "Your data is too large to sync.",
       "rejected": "The cloud couldn’t accept this data.",
@@ -705,5 +886,65 @@
       "server": "Something went wrong while syncing. Try again."
     },
     "link": "Back up and sync"
+  },
+  "calendar": {
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "activeDays": "{count, plural, =0 {No active days in {year}} one {# active day in {year}} other {# active days in {year}}}",
+    "totalDays": "{count, plural, one {# day} other {# days}} in all",
+    "gridLabel": "Days of {year}",
+    "less": "Less",
+    "more": "More",
+    "nothing": "nothing",
+    "hijri": "{day} {month} {year} AH"
+  },
+  "bookmarks": {
+    "place": "{surah}, ayah {ayah}",
+    "add": "Bookmark this ayah",
+    "remove": "Remove bookmark",
+    "toggle": "Bookmark {place}",
+    "note": "Note",
+    "noteFor": "Note for {place}",
+    "noteLabel": "Note",
+    "noteTitle": "Note for {place}",
+    "noteDescription": "A reminder for memorizing or reflecting. It is saved with the bookmark on this device, and in backups and sync.",
+    "save": "Save note",
+    "cancel": "Cancel",
+    "empty": "Bookmark an ayah in Live Quran on the player page, or add a note to one, and it will be listed here.",
+    "play": "Play {place}",
+    "chooseReciter": "Choose a reciter",
+    "removeFor": "Remove {place}",
+    "removed": "Bookmark removed",
+    "undo": "Undo"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "description": "A gentle nudge for your zikir and your daily listening. They stay on this device.",
+    "morning": {
+      "title": "Morning zikir",
+      "hint": "After Fajr",
+      "body": "Time for your morning zikir.",
+      "action": "Open zikir"
+    },
+    "evening": {
+      "title": "Evening zikir",
+      "hint": "Before Maghrib",
+      "body": "Time for your evening zikir.",
+      "action": "Open zikir"
+    },
+    "listening": {
+      "title": "Daily listening",
+      "hint": "Only if you haven’t reached your goal yet",
+      "body": "You haven’t reached today’s listening goal yet.",
+      "action": "Listen"
+    },
+    "timeFor": "Time for {name}",
+    "goal": "Daily listening goal (minutes)",
+    "allow": "Allow notifications",
+    "blocked": "Notifications are blocked for this site, so reminders appear on the Home page when you open the app.",
+    "unsupported": "This browser can’t show notifications here, so reminders appear on the Home page when you open the app. On iPhone, add the app to your Home Screen first.",
+    "limit": "Notifications appear while the app is open or running in the background. A reminder you miss waits on the Home page until you’ve done it or closed it.",
+    "dueLabel": "Reminders for today",
+    "dismiss": "Dismiss {name}"
   }
 }

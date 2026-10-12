@@ -49,3 +49,15 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// A tapped reminder opens its page in a window that is already open, or a new one.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = typeof event.notification.data?.url === "string" ? event.notification.data.url : "/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      const open = windows[0];
+      return open ? open.focus().then((client) => client.navigate(url)) : self.clients.openWindow(url);
+    }),
+  );
+});

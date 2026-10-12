@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLocalizedNumber } from "@/hooks/use-localized-number";
 import { useWakeLock, wakeLockSupported } from "@/hooks/use-wake-lock";
 import { localDateKey } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { Feedback } from "@/lib/zikir/feedback";
 import { dayTotal } from "@/lib/zikir/stats";
 import type { RunRef, ZikirView } from "@/lib/zikir/types";
@@ -56,6 +57,8 @@ export function CounterView({ id }: { id: string }) {
 }
 
 const VIEWS: ZikirView[] = ["beads", "dial", "simple"];
+// Longer texts are set smaller so a whole dua doesn't push the counter off the screen.
+const LONG_ARABIC = 120;
 
 type CounterProps = { reference: RunRef; title: string; description: string; builtIn: boolean; dailyGoal: number | null; steps: CounterStep[] };
 
@@ -124,7 +127,7 @@ function Counter({ reference, title, description, builtIn, dailyGoal, steps }: C
 
       <div className="flex flex-col items-center gap-2 text-center">
         {current?.arabic && (
-          <p className="font-arabic text-4xl leading-loose sm:text-5xl" lang="ar" dir="rtl">
+          <p className={cn("font-arabic leading-loose", current.arabic.length > LONG_ARABIC ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl")} lang="ar" dir="rtl">
             {current.arabic}
           </p>
         )}

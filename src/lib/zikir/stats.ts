@@ -58,3 +58,25 @@ export function zikirStreaks(goals: Goal[], counts: Counts, history: HistoryEntr
   const daily = Object.fromEntries([...days].map((day) => [day, qualifiesForStreak(day, goals, counts, history) ? STREAK_MIN_SECONDS : 0]));
   return computeStreaks(daily, today);
 }
+
+export const dayTotals = (counts: Counts): Record<string, number> => Object.fromEntries(Object.keys(counts).map((day) => [day, dayTotal(counts, day)]));
+
+/** What was counted on a day, biggest first. */
+export function dayBreakdown(counts: Counts, day: string): { itemId: string; count: number }[] {
+  return Object.entries(counts[day] ?? {})
+    .map(([itemId, cells]) => ({ itemId, count: sumCells(cells) }))
+    .filter((entry) => entry.count > 0)
+    .sort((a, b) => b.count - a.count || (a.itemId < b.itemId ? -1 : 1));
+}
+
+export const roundsOnDay = (history: HistoryEntry[], day: string) =>
+  history.filter((entry) => localDateKey(new Date(entry.finishedAt)) === day).sort((a, b) => a.finishedAt - b.finishedAt);
+
+/** The last time anything was counted on a day, on any device. */
+export function lastCountAt(counts: Counts, day: string): number | null {
+  let last: number | null = null;
+  for (const cells of Object.values(counts[day] ?? {})) {
+    for (const cell of Object.values(cells)) if (cell.n > 0 && (last === null || cell.at > last)) last = cell.at;
+  }
+  return last;
+}

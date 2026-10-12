@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/empty-state";
 import { StatTile } from "@/components/stat-tile";
 import { WeekChart } from "@/components/stats/week-chart";
+import { ZikirCalendar } from "./zikir-calendar";
 import { useLocalizedNumber } from "@/hooks/use-localized-number";
 import { activeGoals, dayTotal, lastDaysTotals, lifetimeTotals, zikirStreaks } from "@/lib/zikir/stats";
 import { localDateKey } from "@/lib/format";
@@ -40,6 +41,8 @@ export function ZikirStats() {
         <StatTile label={t("stats.currentStreak")} value={t("stats.days", { count: streaks.current })} hint={t("stats.streakHint")} />
         <StatTile label={t("stats.longestStreak")} value={t("stats.days", { count: streaks.longest })} />
       </div>
+
+      <ZikirCalendar />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <section aria-labelledby="zikir-week-heading" className="flex flex-col gap-4 rounded-2xl border bg-card p-5 lg:col-span-3">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeGoals, addToCell, dayGoalProgress, dayTotal, itemDayTotal, lastDaysTotals, lifetimeTotals, qualifiesForStreak, zikirStreaks, type Goal } from "./stats";
+import { activeGoals, addToCell, dayBreakdown, dayGoalProgress, dayTotal, dayTotals, itemDayTotal, lastCountAt, roundsOnDay, lastDaysTotals, lifetimeTotals, qualifiesForStreak, zikirStreaks, type Goal } from "./stats";
 import type { Counts, HistoryEntry, ZikirGroup, ZikirItem } from "./types";
 
 const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h).getTime();
@@ -148,5 +148,40 @@ describe("activeGoals", () => {
 
   it("is empty when nothing has a goal", () => {
     expect(activeGoals({ items: [item("a", null)], groups: [] })).toEqual([]);
+  });
+});
+
+describe("day views", () => {
+  const counts = counted([
+    ["2026-10-07", "a", "phone", 10],
+    ["2026-10-07", "a", "laptop", 5],
+    ["2026-10-07", "b", "phone", 20],
+    ["2026-10-07", "c", "phone", 0],
+    ["2026-10-08", "a", "phone", 3],
+  ]);
+
+  it("totals every day", () => {
+    expect(dayTotals(counts)).toEqual({ "2026-10-07": 35, "2026-10-08": 3 });
+  });
+
+  it("lists a day's zikir biggest first, adding up devices and leaving out zeros", () => {
+    expect(dayBreakdown(counts, "2026-10-07")).toEqual([
+      { itemId: "b", count: 20 },
+      { itemId: "a", count: 15 },
+    ]);
+    expect(dayBreakdown(counts, "2026-01-01")).toEqual([]);
+  });
+
+  it("finds the rounds finished on a day, in order", () => {
+    const history = [round("late", at(2026, 10, 7, 20)), round("other", at(2026, 10, 8, 9)), round("early", at(2026, 10, 7, 6))];
+    expect(roundsOnDay(history, "2026-10-07").map((entry) => entry.id)).toEqual(["early", "late"]);
+  });
+});
+
+describe("lastCountAt", () => {
+  it("finds the latest count of a day across devices", () => {
+    const counts = addToCell(addToCell(addToCell({}, "2026-10-12", "a", "phone", 1, 50), "2026-10-12", "b", "laptop", 2, 90), "2026-10-11", "a", "phone", 1, 99);
+    expect(lastCountAt(counts, "2026-10-12")).toBe(90);
+    expect(lastCountAt(counts, "2026-10-10")).toBeNull();
   });
 });
