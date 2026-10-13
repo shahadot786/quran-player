@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, CopyIcon, DownloadIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, DownloadIcon, EyeIcon, EyeOffIcon, LinkIcon, PencilIcon } from "lucide-react";
 import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { formatKey } from "@/lib/sync/key";
 import { SITE_URL } from "@/lib/site";
 
-export function KeyPanel({ syncKey }: { syncKey: string }) {
+export function KeyPanel({ syncKey, onChange }: { syncKey: string; onChange: () => void }) {
   const t = useTranslations("sync.key");
+  const tChange = useTranslations("sync.change");
   const id = useId();
   const [shown, setShown] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -22,6 +23,15 @@ export function KeyPanel({ syncKey }: { syncKey: string }) {
       setCopied(true);
       toast.success(t("copied"));
       window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error(t("copyError"));
+    }
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/stats#code=${encodeURIComponent(sentence)}`);
+      toast.success(t("linkCopied"));
     } catch {
       toast.error(t("copyError"));
     }
@@ -53,10 +63,18 @@ export function KeyPanel({ syncKey }: { syncKey: string }) {
         </Button>
       </div>
       <p className="max-w-prose text-sm text-muted-foreground">{t("warning")}</p>
-      <div>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={copyLink} title={t("linkHint")}>
+          <LinkIcon />
+          {t("link")}
+        </Button>
         <Button variant="outline" size="sm" onClick={save}>
           <DownloadIcon />
           {t("save")}
+        </Button>
+        <Button variant="outline" size="sm" onClick={onChange}>
+          <PencilIcon />
+          {tChange("open")}
         </Button>
       </div>
     </div>

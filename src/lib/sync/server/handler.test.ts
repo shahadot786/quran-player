@@ -1,12 +1,15 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { generateKey, hashKey } from "../key";
+import { randomBytes } from "node:crypto";
+import { hashKey } from "../key";
 import type { SyncSnapshot } from "../types";
 import { handleCleanup, handleSync, MAX_BODY_BYTES, type SyncDeps } from "./handler";
 import { createMemoryStore } from "./memory-store";
 import { LIMITS } from "./rate-limit";
 
 const SECRET = "test-secret";
+// What the app sends for a code: a token of 43 url-safe characters derived on the device.
+const generateKey = () => randomBytes(32).toString("base64url");
 const blank = (): SyncSnapshot => ({
   library: { favoriteReciters: [], favoriteSurahs: [], playlists: [], history: [] },
   stats: { totalSeconds: 0, daily: {}, reciters: {}, completed: {} },
@@ -38,7 +41,7 @@ describe("authentication", () => {
   it("rejects a missing, malformed or wrongly formed key with 401, before touching the database", async () => {
     const { call, store } = setup();
     const hit = vi.spyOn(store, "hit");
-    for (const key of [null, "short", "a".repeat(44), "abandon-ability-able", `${generateKey()}-able`, generateKey().toUpperCase()]) {
+    for (const key of [null, "short", "a".repeat(44), "a".repeat(42), `${"a".repeat(42)}!`, "lunar-pizza-tiger-cabin-42", "abandon-ability-able"]) {
       const response = await call("GET", key);
       expect(response.status).toBe(401);
     }

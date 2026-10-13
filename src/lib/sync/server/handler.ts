@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { hashKey, isValidKey } from "../key";
+import { hashKey, isAuthToken, isLegacyKey } from "../key";
 import { isSyncSnapshot } from "../snapshot";
 import { checkLimits, LIMITS, type Limit } from "./rate-limit";
 import type { SnapshotStore } from "./store";
@@ -53,7 +53,8 @@ async function limited(deps: SyncDeps & { store: SnapshotStore }, limits: Limit[
 
 export async function handleSync(request: Request, method: "GET" | "PUT" | "DELETE", deps: SyncDeps): Promise<Response> {
   const key = bearer(request);
-  if (!isValidKey(key)) return reply(401, { error: "invalid-key" });
+  // Codes arrive as the long token the device derived from them; only keys from before codes are sent as they are.
+  if (key === null || (!isLegacyKey(key) && !isAuthToken(key))) return reply(401, { error: "invalid-key" });
   if (!deps.store) return reply(503, { error: "not-configured" });
   const store = deps.store;
   const ready = { ...deps, store };

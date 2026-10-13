@@ -2,6 +2,7 @@ import type { LibraryData, StatsData } from "./sync/types";
 import type { ProgressSnapshot } from "@/stores/progress-store";
 import { NOTE_LIMIT, bookmarkKey, type Bookmark } from "@/stores/bookmark-store";
 import type { ListeningSession } from "@/stores/session-store";
+import type { DeviceEntry } from "./sync/types";
 import type { ZikirSnapshot } from "@/stores/zikir-store";
 import { decodeSlices } from "./progress/slices";
 import type { Track } from "./types";
@@ -182,4 +183,20 @@ export const isBookmarks: Guard<Record<string, Bookmark>> = (value): value is Re
       isNumber(bookmark.createdAt) &&
       isNumber(bookmark.updatedAt) &&
       isNullableTime(bookmark.deletedAt),
+  );
+
+export const MAX_DEVICES = 30;
+export const isDevices: Guard<Record<string, DeviceEntry>> = (value): value is Record<string, DeviceEntry> =>
+  isRecord(value) &&
+  Object.keys(value).length <= MAX_DEVICES &&
+  Object.entries(value).every(
+    ([id, device]) =>
+      id.length >= 1 &&
+      id.length <= 100 &&
+      isRecord(device) &&
+      isString(device.name) &&
+      device.name.length <= 80 &&
+      isNumber(device.syncedAt) &&
+      isNumber(device.updatedAt) &&
+      isBoolean(device.removed),
   );

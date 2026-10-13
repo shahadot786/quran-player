@@ -27,7 +27,7 @@ describe("useSync", () => {
 
   it("replaces a key that is neither kind", () => {
     useSyncStore.setState({ key: "something-else" });
-    expect(useSyncStore.getState().ensureKey().split("-")).toHaveLength(12);
+    expect(useSyncStore.getState().ensureKey().split("-")).toHaveLength(5);
   });
 
   it("uploads on sync and remembers when", async () => {
@@ -86,4 +86,35 @@ describe("useSync", () => {
     expect(useSyncStore.getState().lastSyncedAt).toBeNull();
     await act(async () => expect(await result.current.restore(key)).toEqual({ ok: false, error: "not-found" }));
   });
+
+  it("turns automatic sync off when the cloud data is deleted, so it can't upload again", async () => {
+    const cloud = createFakeSyncApi();
+    const { result } = renderHook(() => useSync(cloud.api));
+    await act(async () => void (await result.current.sync()));
+    useSyncStore.getState().setAuto(true);
+    await act(async () => void (await result.current.deleteCloud()));
+    expect(useSyncStore.getState().auto).toBe(false);
+    expect(useSyncStore.getState().devices).toEqual({});
+  });
+
+  it("shows only the restored key's devices after a restore, and keeps the old list when it fails", async () => {
+    const cloud = createFakeSyncApi();
+    const phone = renderHook(() => useSync(cloud.api));
+    await act(async () => void (await phone.result.current.sync()));
+    const key = useSyncStore.getState().key!;
+    const record = cloud.records.get(key)!;
+    record.snapshot.devices = { ...record.snapshot.devices, laptop: { name: "Edge · Windows", syncedAt: 5, updatedAt: 5, removed: false } };
+    record.version += 1;
+
+    resetStores();
+    useSyncStore.getState().registerDevice("old-device", "Old", 1);
+    const fresh = renderHook(() => useSync(cloud.api));
+    await act(async () => expect(await fresh.result.current.restore(generateKey())).toEqual({ ok: false, error: "not-found" }));
+    expect(Object.keys(useSyncStore.getState().devices)).toEqual(["old-device"]);
+
+    await act(async () => expect(await fresh.result.current.restore(key)).toEqual({ ok: true }));
+    expect(Object.keys(useSyncStore.getState().devices)).not.toContain("old-device");
+    expect(Object.keys(useSyncStore.getState().devices)).toContain("laptop");
+  });
 });
+
