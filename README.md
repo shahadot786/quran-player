@@ -53,12 +53,14 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 - **Backup**: export, import or reset all local data as JSON.
 
 ### Cloud sync (optional)
-- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a random key in your browser, a short story such as *7 quiet golden camels slowly stroll past the sunny river at dawn* (about 65 bits, so it can't be guessed; older eight-word keys keep working), and the cloud keeps one copy of your progress, zikir, stats and library under a hash of that key. The key itself is never stored on the server.
+- **Nothing leaves your device unless you press Sync.** There are no accounts: the app makes a short **sync code** in your browser, four simple words and a number such as *lunar pizza tiger cabin 42*, or you can type a phrase of your own (at least four words). The code is stretched on your device (PBKDF2, 600,000 rounds) into a long token before anything is sent, so the words themselves never leave it and every guess costs a lot of work. The cloud keeps one copy of your progress, zikir, stats and library under a hash of that token. Older long keys keep working.
 - **Sync now** pulls the cloud copy, merges it with this device (progress heard on either device counts, zikir counted on two devices adds up, deleted zikir stay deleted) and saves the result in both places, so one device never overwrites another.
-- **Restore from key** brings your data to another device or after clearing the browser. **Delete my cloud data** removes the cloud copy and leaves the data on your device alone.
-- Anyone who has your key can read and change your cloud copy, and a lost key can't be recovered, so keep it safe. The JSON backup stays as a second safety net.
+- **Sync automatically** (off until you turn it on, after your first sync): the first time you open the app each day it syncs for you and shows "Auto sync done". A sync you did yourself that day counts. If it can't finish, it tells you once and tries again when you next open the app or get back online.
+- **Devices using this code:** the sync card lists every device that has synced, with its last sync time. Each starts with a name made from its browser (such as "Chrome · Android"); rename yours, or remove an old device from the list. A removed device comes back the next time it syncs. Only the browser and system names are stored, and "Delete my cloud data" also turns auto sync off.
+- **Restore from code** brings your data to another device or after clearing the browser. **Delete my cloud data** removes the cloud copy and leaves the data on your device alone.
+- Anyone who has your code can read and change your cloud copy, and a lost code can't be recovered, so keep it safe. **Copy link** makes a link that fills the code in on another device, and **Change code** moves your cloud copy to a code you prefer (a code already in use is refused). The JSON backup stays as a second safety net.
 - Removing a favorite, deleting a playlist, removing a bookmark or a zikir all carry over to your other devices.
-- **Save key as file** keeps a copy of your key with instructions.
+- **Save as file** keeps a copy of your code with instructions.
 - Sync is off unless the server has a database configured (see Environment).
 
 ### Offline and installable
@@ -77,6 +79,7 @@ Listen to the whole Quran, surah by surah, in the voices of more than 230 recite
 | [quran.com](https://quran.com/) API v4 | A dozen more recitations, ayah timings, surah metadata | Downloadable for offline. |
 | [islamic.network](https://islamic.network/) audio CDN | Reciters missing a complete recitation elsewhere | Streams, but sends no CORS headers, so these can't be downloaded. They are labeled "streaming only". |
 | [alquran.cloud](https://alquran.cloud/) / quran.com | Arabic text and the Bengali translation | Cached on the device. |
+| [sunnah.com](https://sunnah.com/hisn) Hisnul Muslim | The morning and evening adhkar: Arabic, transliteration, English meaning and counts | Written into the app's built-in zikir once; the Bengali text was written for this app. Typos on the source pages were fixed, and the evening wording of entries 77, 80 and 81, which the source gives only in transliteration, was derived from its footnotes. |
 
 The three audio catalogs are merged into one list: earlier sources win, and a later source only fills in a recitation the earlier ones don't have. Details are in `src/lib/api/merge.ts`.
 

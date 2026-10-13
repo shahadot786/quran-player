@@ -3,6 +3,7 @@ import { useLibraryStore } from "@/stores/library-store";
 import { useProgressStore } from "@/stores/progress-store";
 import { useSessionStore } from "@/stores/session-store";
 import { useStatsStore } from "@/stores/stats-store";
+import { useSyncStore } from "@/stores/sync-store";
 import { useZikirStore } from "@/stores/zikir-store";
 import { syncWindow, unionSessions } from "./merge";
 import type { SyncSnapshot } from "./types";
@@ -19,6 +20,7 @@ export function readLocalSnapshot(): SyncSnapshot {
     zikir: { items: zikir.items, groups: zikir.groups, counts: zikir.counts, history: zikir.history, builtIns: zikir.builtIns },
     sessions: syncWindow(unionSessions(useSessionStore.getState().sessions, [])),
     bookmarks: useBookmarkStore.getState().bookmarks,
+    devices: useSyncStore.getState().devices,
   };
 }
 
@@ -28,6 +30,7 @@ export function writeLocalSnapshot(snapshot: SyncSnapshot) {
   useProgressStore.getState().restore(snapshot.progress);
   useZikirStore.getState().restore(snapshot.zikir, { keepRuns: true });
   // The snapshot only carries the recent log, so it is added to what this device has rather than replacing it.
+  if (snapshot.devices) useSyncStore.getState().setDevices(snapshot.devices);
   if (snapshot.bookmarks) useBookmarkStore.getState().restore(snapshot.bookmarks);
   if (snapshot.sessions) useSessionStore.getState().restore(unionSessions(useSessionStore.getState().sessions, snapshot.sessions));
 }

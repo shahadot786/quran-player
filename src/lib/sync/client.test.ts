@@ -4,7 +4,7 @@ import { resetStores } from "@/test/reset-stores";
 import { useStatsStore } from "@/stores/stats-store";
 import { useZikirStore } from "@/stores/zikir-store";
 import { httpApi, runSync, SyncError, type LocalData } from "./client";
-import { generateKey } from "./key";
+import { authToken, generateKey } from "./key";
 import { readLocalSnapshot, writeLocalSnapshot } from "./local";
 import { mergeSnapshots } from "./merge";
 import type { SyncSnapshot } from "./types";
@@ -139,12 +139,13 @@ describe("httpApi", () => {
   const respond = (status: number, body: unknown = {}, headers: Record<string, string> = {}) =>
     vi.stubGlobal("fetch", vi.fn(async () => new Response(status === 204 ? null : JSON.stringify(body), { status, headers })));
 
-  it("sends the key only in the Authorization header", async () => {
+  it("sends a token derived from the code, never the words, and only in the Authorization header", async () => {
     respond(200, { version: 1, snapshot: blank() });
     await httpApi.get(key);
     const [url, init] = vi.mocked(fetch).mock.calls[0]!;
     expect(String(url)).toBe("/api/sync");
-    expect((init!.headers as Record<string, string>).Authorization).toBe(`Bearer ${key}`);
+    expect((init!.headers as Record<string, string>).Authorization).toBe(`Bearer ${await authToken(key)}`);
+    expect((init!.headers as Record<string, string>).Authorization).not.toContain(key.split("-")[0]!);
   });
 
   it("reads 404 as no cloud copy and a 409 as a conflict carrying the cloud copy", async () => {

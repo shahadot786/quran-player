@@ -11,6 +11,9 @@ export type LibraryData = Pick<ReturnType<typeof useLibraryStore.getState>, "fav
 };
 export type StatsData = Pick<ReturnType<typeof useStatsStore.getState>, "totalSeconds" | "daily" | "reciters" | "completed">;
 
+/** One device that syncs with a key. A removed device stays as a marker so the removal reaches the others. */
+export type DeviceEntry = { name: string; syncedAt: number; updatedAt: number; removed: boolean };
+
 /** What the cloud keeps: the listening and zikir data, without queue, volume or other device settings. */
 export type SyncSnapshot = {
   library: LibraryData;
@@ -20,4 +23,6 @@ export type SyncSnapshot = {
   /** The recent part of the listening log; copies saved before the log existed don't have it. */
   sessions?: ListeningSession[];
   bookmarks?: Record<string, Bookmark>;
+  /** The devices that have synced, by device id. */
+  devices?: Record<string, DeviceEntry>;
 };

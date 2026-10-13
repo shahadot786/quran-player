@@ -14,15 +14,18 @@ export function RestoreDialog({
   onOpenChange,
   onRestore,
   busy,
+  initialValue = "",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRestore: (key: string) => Promise<SyncResult>;
   busy: boolean;
+  /** A code already filled in, for one that arrived in a link. */
+  initialValue?: string;
 }) {
   const t = useTranslations("sync");
   const id = useId();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<SyncErrorCode | null>(null);
 
   const submit = async (event: FormEvent) => {

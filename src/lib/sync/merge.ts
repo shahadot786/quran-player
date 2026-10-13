@@ -5,8 +5,9 @@ import type { ProgressSnapshot, SurahLifetime } from "@/stores/progress-store";
 import type { ListeningSession } from "@/stores/session-store";
 import { HISTORY_LIMIT as ROUNDS_LIMIT, type ZikirSnapshot } from "@/stores/zikir-store";
 import type { Counts } from "@/lib/zikir/types";
+import { MAX_DEVICES } from "@/lib/backup-guards";
 import { SYNC_SESSION_LIMIT } from "./limits";
-import type { LibraryData, StatsData, SyncSnapshot } from "./types";
+import type { DeviceEntry, LibraryData, StatsData, SyncSnapshot } from "./types";
 
 // Every merger below gives the same result whatever order the two sides come in, so two devices end up identical.
 
@@ -174,8 +175,16 @@ export function mergeSnapshots(a: SyncSnapshot, b: SyncSnapshot): SyncSnapshot {
   return {
     ...merged,
     ...(a.sessions || b.sessions ? { sessions: syncWindow(unionSessions(a.sessions ?? [], b.sessions ?? [])) } : {}),
+    ...(a.devices || b.devices ? { devices: mergeDevices(a.devices ?? {}, b.devices ?? {}) } : {}),
     ...(a.bookmarks || b.bookmarks ? { bookmarks: mergeKeyed(a.bookmarks ?? {}, b.bookmarks ?? {}, (x, y) => pick(x, y, (bookmark) => bookmark.updatedAt)) } : {}),
   };
+}
+
+/** Each device's entry as of its latest change; the most recently touched ones are kept when there are too many. */
+export function mergeDevices(a: Record<string, DeviceEntry>, b: Record<string, DeviceEntry>): Record<string, DeviceEntry> {
+  const merged = mergeKeyed(a, b, (x, y) => pick(x, y, (device) => device.updatedAt));
+  const newest = Object.entries(merged).sort(([idX, x], [idY, y]) => y.updatedAt - x.updatedAt || byText(idX, idY));
+  return Object.fromEntries(newest.slice(0, MAX_DEVICES));
 }
 
 export const sameSnapshot = (a: SyncSnapshot, b: SyncSnapshot) => stableStringify(a) === stableStringify(b);

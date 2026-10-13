@@ -1,13 +1,17 @@
 "use client";
 
 import { CloudIcon, KeyRoundIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { cleanKey, isLegacyKey } from "@/lib/sync/key";
 import { useHydrated } from "@/stores/hydration";
 import { useSyncStore } from "@/stores/sync-store";
+import { AutoSyncRow } from "./auto-sync-row";
+import { ChangeCodeDialog } from "./change-code-dialog";
+import { DevicesList } from "./devices-list";
 import { KeyPanel } from "./key-panel";
 import { RestoreDialog } from "./restore-dialog";
 import { useSync, type SyncResult } from "./use-sync";
@@ -18,10 +22,27 @@ export function SyncCard() {
   const hydrated = useHydrated();
   const syncKey = useSyncStore((state) => state.key);
   const lastSyncedAt = useSyncStore((state) => state.lastSyncedAt);
-  const { busy, sync, restore, deleteCloud } = useSync();
+  const { busy, sync, restore, change, deleteCloud } = useSync();
   const [restoreOpen, setRestoreOpen] = useState(false);
+  const [changeOpen, setChangeOpen] = useState(false);
+  const [fromLink, setFromLink] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [message, setMessage] = useState("");
+
+  // A link made by "Copy link" carries the code after the #, which never reaches a server; it only fills in the restore form.
+  // The form opens a tick later, once the page is up, so the server and browser render the same first frame.
+  useEffect(() => {
+    const match = /^#code=(.+)$/.exec(window.location.hash);
+    if (!match) return;
+    const code = cleanKey(decodeURIComponent(match[1]!));
+    const timer = window.setTimeout(() => {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      if (!code) return;
+      setFromLink(code.replace(/-/g, " "));
+      setRestoreOpen(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const report = (result: SyncResult, success: string) => {
     const text = result.ok ? success : t(`errors.${result.error}`);
@@ -52,7 +73,19 @@ export function SyncCard() {
       <p role="status" aria-live="polite" className="sr-only">
         {message}
       </p>
-      {hydrated && syncKey && <KeyPanel syncKey={syncKey} />}
+      {hydrated && <AutoSyncRow />}
+      {hydrated && syncKey && isLegacyKey(syncKey) && (
+        <div className="flex flex-col gap-2 rounded-xl bg-gold/15 p-4 text-sm">
+          <p className="font-medium">{t("change.legacyTitle")}</p>
+          <p>{t("change.legacyBody")}</p>
+          <div>
+            <Button size="sm" variant="outline" onClick={() => setChangeOpen(true)}>
+              {t("change.legacyAction")}
+            </Button>
+          </div>
+        </div>
+      )}
+      {hydrated && syncKey && <KeyPanel syncKey={syncKey} onChange={() => setChangeOpen(true)} />}
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" disabled={busy !== null} onClick={() => setRestoreOpen(true)}>
           <KeyRoundIcon />
@@ -63,8 +96,21 @@ export function SyncCard() {
           {t("delete.open")}
         </Button>
       </div>
+      {hydrated && <DevicesList />}
       <p className="max-w-prose text-xs text-muted-foreground">{t("privacy")}</p>
+      <ChangeCodeDialog
+        open={changeOpen}
+        onOpenChange={setChangeOpen}
+        busy={busy === "change"}
+        onChange={async (code) => {
+          const result = await change(code);
+          if (result.ok) report(result, t("change.done"));
+          return result;
+        }}
+      />
       <RestoreDialog
+        key={fromLink}
+        initialValue={fromLink}
         open={restoreOpen}
         onOpenChange={setRestoreOpen}
         busy={busy === "restore"}

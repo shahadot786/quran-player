@@ -1,8 +1,9 @@
+import { authToken } from "./key";
 import { mergeSnapshots, sameSnapshot } from "./merge";
 import { isSyncSnapshot } from "./snapshot";
 import type { SyncSnapshot } from "./types";
 
-export type SyncErrorCode = "offline" | "invalid-key" | "rate-limited" | "too-large" | "rejected" | "not-configured" | "not-found" | "conflict" | "server";
+export type SyncErrorCode = "offline" | "invalid-key" | "rate-limited" | "too-large" | "rejected" | "not-configured" | "not-found" | "code-taken" | "conflict" | "server";
 
 export class SyncError extends Error {
   constructor(
@@ -79,7 +80,7 @@ async function request(key: string, init: RequestInit): Promise<Response> {
     return await fetch("/api/sync", {
       ...init,
       cache: "no-store",
-      headers: { Authorization: `Bearer ${key}`, ...(init.body ? { "Content-Type": "application/json" } : {}) },
+      headers: { Authorization: `Bearer ${await authToken(key)}`, ...(init.body ? { "Content-Type": "application/json" } : {}) },
     });
   } catch {
     throw new SyncError("offline");

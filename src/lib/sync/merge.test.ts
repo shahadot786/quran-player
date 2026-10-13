@@ -3,6 +3,7 @@ import { encodeSlices, markRange, emptySlices } from "@/lib/progress/slices";
 import { makeTrack } from "@/test/fixtures";
 import { mergeSnapshots, sameSnapshot, stableStringify, syncWindow, unionSessions } from "./merge";
 import { SYNC_SESSION_LIMIT } from "./limits";
+import { MAX_DEVICES } from "@/lib/backup-guards";
 import { isSyncSnapshot } from "./snapshot";
 import type { SyncSnapshot } from "./types";
 
@@ -140,6 +141,36 @@ describe("removing from the library", () => {
   });
 });
 
+describe("devices", () => {
+  const device = (name: string, updatedAt: number, removed = false) => ({ name, syncedAt: updatedAt, updatedAt, removed });
+  const withDevices = (devices: NonNullable<SyncSnapshot["devices"]>): SyncSnapshot => ({ ...EMPTY, devices });
+
+  it("lists the devices of both sides and keeps each one's latest entry", () => {
+    const merged = mergeSnapshots(withDevices({ phone: device("Phone", 5), laptop: device("Laptop", 3) }), withDevices({ phone: device("My phone", 9), tablet: device("Tablet", 1) })).devices!;
+    expect(Object.keys(merged).sort()).toEqual(["laptop", "phone", "tablet"]);
+    expect(merged.phone!.name).toBe("My phone");
+  });
+
+  it("carries a removal, and lets the device come back by syncing again", () => {
+    const removed = mergeSnapshots(withDevices({ tablet: device("Tablet", 4) }), withDevices({ tablet: device("Tablet", 8, true) })).devices!;
+    expect(removed.tablet!.removed).toBe(true);
+    const back = mergeSnapshots(withDevices(removed), withDevices({ tablet: device("Tablet", 12) })).devices!;
+    expect(back.tablet!.removed).toBe(false);
+  });
+
+  it("keeps only the most recently touched devices when there are too many", () => {
+    const many = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`d${String(i).padStart(2, "0")}`, device(`D${i}`, i)]));
+    const merged = mergeSnapshots(withDevices(many), EMPTY).devices!;
+    expect(Object.keys(merged)).toHaveLength(MAX_DEVICES);
+    expect(merged.d39).toBeDefined();
+    expect(merged.d00).toBeUndefined();
+  });
+
+  it("leaves copies without a device list alone", () => {
+    expect(mergeSnapshots(EMPTY, EMPTY).devices).toBeUndefined();
+  });
+});
+
 describe("ayah bookmarks", () => {
   const mark = (note: string, updatedAt: number, deletedAt: number | null = null) => ({ surah: 18, ayah: 10, note, createdAt: 1, updatedAt, deletedAt });
 
@@ -264,6 +295,11 @@ function randomSnapshotWithoutMarks(random: () => number): SyncSnapshot {
       history: some(4, () => ({ id: `h${int(4)}`, kind: "item" as const, refId: "x", name: null, count: 1 + int(5), finishedAt: int(100), completed: true })),
       builtIns: { [`b${int(2)}`]: { removed: random() < 0.5, at: int(20) } },
     },
+    ...(random() < 0.6
+      ? {
+          devices: Object.fromEntries(some(3, () => int(4)).map((k) => [`dev${k}`, { name: `Device ${int(3)}`, syncedAt: int(50), updatedAt: int(50), removed: random() < 0.3 }])),
+        }
+      : {}),
     ...(random() < 0.6
       ? {
           bookmarks: Object.fromEntries(
