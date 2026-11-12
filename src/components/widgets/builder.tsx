@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getLocalizedReciterName } from "@/lib/bengali-data";
 import {
   COLOR_FIELDS,
   DEFAULT_SETTINGS,
@@ -18,7 +17,7 @@ import {
   type Kind,
   type Settings,
 } from "@/lib/embed/build";
-import { WIDGET_RECITER_IDS, WIDGET_RECITER_NAMES } from "@/lib/embed/options";
+import { ReciterPicker } from "@/components/embed/reciter-picker";
 import { snippets } from "@/lib/widget/snippets";
 import { ColorField } from "./color-field";
 import { CopyButton } from "./copy-button";
@@ -27,10 +26,9 @@ import { Segmented } from "./segmented";
 
 type Target = "script" | "iframe" | "reactNative" | "flutter";
 
-export function Builder({ origin, initial }: { origin: string; initial: Settings }) {
+export function Builder({ origin, initial, reciters }: { origin: string; initial: Settings; reciters: { id: number; name: string }[] }) {
   const t = useTranslations("widgets.builder");
   const guide = useTranslations("widgets.guide");
-  const locale = useLocale();
   const [settings, setSettings] = useState(initial);
   const [target, setTarget] = useState<Target>(initial.kind === "app" ? "reactNative" : "script");
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => setSettings((current) => ({ ...current, [key]: value }));
@@ -151,18 +149,7 @@ export function Builder({ origin, initial }: { origin: string; initial: Settings
             />
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="builder-reciter">{t("reciter")}</Label>
-              <select
-                id="builder-reciter"
-                value={settings.reciter}
-                onChange={(event) => set("reciter", Number(event.target.value))}
-                className="h-10 w-full rounded-lg border border-input bg-card px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                {WIDGET_RECITER_IDS.map((id) => (
-                  <option key={id} value={id}>
-                    {getLocalizedReciterName(WIDGET_RECITER_NAMES[id], locale)}
-                  </option>
-                ))}
-              </select>
+              <ReciterPicker id="builder-reciter" reciters={reciters} value={settings.reciter} onSelect={(id) => set("reciter", id)} prefix={t("reciter")} />
             </div>
           </section>
 

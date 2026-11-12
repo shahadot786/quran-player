@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { EmbedRoot } from "@/components/embed/embed-root";
 import { EmbedWidget } from "@/components/embed/embed-widget";
-import { parseEmbedOptions, type SearchParams } from "@/lib/embed/options";
+import { DEFAULT_WIDGET_RECITER, parseEmbedOptions, type SearchParams } from "@/lib/embed/options";
 import { getWidgetReciters } from "@/lib/embed/reciters";
 
 export default async function EmbedPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -11,10 +11,11 @@ export default async function EmbedPage({ searchParams }: { searchParams: Promis
     getWidgetReciters(),
   ]);
   const { embed, app, player, surahs } = messages;
+  const reciter = reciters.some((candidate) => candidate.id === options.reciter) ? options.reciter : DEFAULT_WIDGET_RECITER;
   return (
     <NextIntlClientProvider locale={options.lang} messages={{ embed, app, player, surahs }}>
       <EmbedRoot options={options}>
-        <EmbedWidget reciters={reciters} options={options} />
+        <EmbedWidget reciters={reciters} options={{ ...options, reciter }} />
       </EmbedRoot>
     </NextIntlClientProvider>
   );

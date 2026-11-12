@@ -27,8 +27,14 @@ describe("parseEmbedOptions", () => {
   });
 
   it("falls back on bad values", () => {
-    const options = parseEmbedOptions({ theme: "pink", lang: "fr", size: "huge", style: "x", radius: "9", reciter: "999", host: "bad host!" });
+    const options = parseEmbedOptions({ theme: "pink", lang: "fr", size: "huge", style: "x", radius: "9", reciter: "abc", host: "bad host!" });
     expect(options).toMatchObject({ theme: "auto", lang: "en", size: "full", style: "koi", radius: "md", reciter: DEFAULT_WIDGET_RECITER, host: null });
+  });
+
+  it("takes any whole reciter number, since the page checks it against the list", () => {
+    expect(parseEmbedOptions({ reciter: "118" }).reciter).toBe(118);
+    expect(parseEmbedOptions({ reciter: "999" }).reciter).toBe(999);
+    for (const value of ["0", "-3", "1.5", "abc", "", "99999999999", undefined]) expect(parseEmbedOptions({ reciter: value }).reciter, String(value)).toBe(DEFAULT_WIDGET_RECITER);
   });
 
   it("uses the first value of a repeated parameter", () => {

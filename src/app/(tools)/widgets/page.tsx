@@ -3,7 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { ThemeScope } from "@/components/theme-scope";
 import { Dashboard, type DashboardData, type WidgetsTab } from "@/components/widgets/dashboard";
 import { settingsFromParams } from "@/lib/embed/build";
-import { normalizeHost, type SearchParams } from "@/lib/embed/options";
+import { DEFAULT_WIDGET_RECITER, normalizeHost, type SearchParams } from "@/lib/embed/options";
+import { getReciterChoices } from "@/lib/embed/reciters";
 import { SITE_URL } from "@/lib/site";
 import { parseRange, sinceDay } from "@/lib/widget/report";
 import { widgetDeps } from "@/lib/widget/server/deps";
@@ -33,6 +34,8 @@ export default async function WidgetsPage({ searchParams }: { searchParams: Prom
   const tab: WidgetsTab = params.tab === "numbers" ? "numbers" : params.tab === "guide" ? "guide" : "builder";
   const days = parseRange(params.days);
   const host = normalizeHost(first(params.host));
+  const reciters = await getReciterChoices();
+  const settings = settingsFromParams(params);
   return (
     <ThemeScope>
       <Dashboard
@@ -41,7 +44,8 @@ export default async function WidgetsPage({ searchParams }: { searchParams: Prom
         days={days}
         host={host}
         origin={new URL(SITE_URL).origin}
-        settings={settingsFromParams(params)}
+        reciters={reciters}
+        settings={reciters.some((reciter) => reciter.id === settings.reciter) ? settings : { ...settings, reciter: DEFAULT_WIDGET_RECITER }}
       />
     </ThemeScope>
   );

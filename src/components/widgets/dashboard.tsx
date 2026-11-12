@@ -166,6 +166,7 @@ export async function Dashboard({
   host,
   origin,
   settings,
+  reciters,
 }: {
   tab: WidgetsTab;
   data: DashboardData;
@@ -173,6 +174,7 @@ export async function Dashboard({
   host: string | null;
   origin: string;
   settings: Settings;
+  reciters: { id: number; name: string }[];
 }) {
   const t = await getTranslations("widgets");
 
@@ -202,7 +204,7 @@ export async function Dashboard({
         ))}
       </nav>
 
-      {tab === "builder" && <Builder origin={origin} initial={settings} />}
+      {tab === "builder" && <Builder origin={origin} initial={settings} reciters={reciters} />}
       {tab === "numbers" && <Numbers data={data} days={days} host={host} />}
       {tab === "guide" && <Guide origin={origin} />}
     </main>

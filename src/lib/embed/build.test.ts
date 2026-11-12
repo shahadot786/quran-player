@@ -55,7 +55,7 @@ describe("settingsQuery and settingsFromParams", () => {
 
   it("falls back to the defaults for missing or bad parameters", () => {
     expect(settingsFromParams({})).toEqual(DEFAULT_SETTINGS);
-    expect(settingsFromParams({ kind: "robot", theme: "pink", reciter: "7", accent: "nope" })).toEqual(DEFAULT_SETTINGS);
+    expect(settingsFromParams({ kind: "robot", theme: "pink", reciter: "abc", accent: "nope" })).toEqual(DEFAULT_SETTINGS);
   });
 
   it("limits the length of the name", () => {
