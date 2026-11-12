@@ -16,7 +16,7 @@ export const LIMITS = {
 const span = (window: Limit["window"]) => (window === "hour" ? HOUR_MS : DAY_MS);
 
 /** Counts every limit that applies and returns the seconds to wait if one is used up, or null when the request may go on. */
-export async function checkLimits(store: SnapshotStore, limits: Limit[], now: Date): Promise<number | null> {
+export async function checkLimits(store: Pick<SnapshotStore, "hit">, limits: Limit[], now: Date): Promise<number | null> {
   for (const { bucket, max, window } of limits) {
     const length = span(window);
     const start = Math.floor(now.getTime() / length) * length;

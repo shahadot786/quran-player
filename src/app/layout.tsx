@@ -2,12 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Amiri, Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { SerwistProvider } from "@serwist/turbopack/react";
 import { AudioEngine } from "@/components/player/audio-engine";
-import { PlayerBar } from "@/components/player/player-bar";
-import { MobileHeader } from "@/components/layout/mobile-header";
-import { MobileNav } from "@/components/layout/mobile-nav";
-import { Sidebar } from "@/components/layout/sidebar";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
@@ -99,7 +94,6 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const t = await getTranslations("nav");
   const appT = await getTranslations("app");
   const locale = await getLocale();
 
@@ -127,30 +121,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-dvh bg-background" suppressHydrationWarning>
         <NextIntlClientProvider locale={locale}>
-          <SerwistProvider swUrl="/serwist/sw.js">
-            <Providers>
-              <a
-                href="#main"
-                className="sr-only rounded-lg bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
-              >
-                {t("skipToContent")}
-              </a>
-              <div className="flex min-h-dvh">
-                <Sidebar />
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <MobileHeader />
-                  <main id="main" className="flex-1 px-4 pt-6 pb-48 sm:px-6 lg:px-10 lg:pt-10 lg:pb-36">
-                    <div className="mx-auto w-full max-w-6xl">{children}</div>
-                  </main>
-                </div>
-              </div>
-              <div className="fixed inset-x-0 bottom-0 z-40 lg:left-64">
-                <PlayerBar />
-                <MobileNav />
-              </div>
-              <AudioEngine />
-            </Providers>
-          </SerwistProvider>
+          <Providers>
+            {children}
+            <AudioEngine />
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

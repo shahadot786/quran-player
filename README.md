@@ -129,7 +129,8 @@ Open [http://localhost:3000](http://localhost:3000).
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, `robots.txt` and OpenGraph tags | `https://tilawah.shahadot.dev` |
 | `DATABASE_URL` | Neon connection string (pooled) for cloud sync. Server only. Without it, sync answers "not available" and everything else works | unset |
-| `CRON_SECRET` | Secret for the weekly cleanup job at `/api/sync/cleanup`. Also used to hash addresses for rate limits. Server only | unset |
+| `CRON_SECRET` | Secret for the cleanup jobs at `/api/sync/cleanup` and `/api/widget/cleanup`. Also used to hash addresses for rate limits. Server only | unset |
+| `WIDGET_SALT` | Random text that keys the daily visitor hashes of the embeddable player. Server only. Without it nothing is counted | unset |
 
 Never commit real values: they belong in `.env.local` and in your host's environment settings.
 
@@ -152,7 +153,7 @@ The data files are committed. Only re-run `sources`, `timings` and `juzs` when y
 
 ## Quality checks
 
-Everything below also runs in GitHub Actions on every push and pull request:
+Everything below also runs in GitHub Actions on every pull request into `master`:
 
 ```bash
 yarn lint
@@ -186,6 +187,10 @@ The app deploys on [Vercel](https://vercel.com):
 2. Optionally set `NEXT_PUBLIC_SITE_URL` (the default is already `https://tilawah.shahadot.dev`). If you set it, use the production domain.
 3. For cloud sync, create a free Neon project, run `yarn db:migrate` once against it, and set `DATABASE_URL` and `CRON_SECRET` in the Vercel project. `vercel.json` schedules the weekly cleanup of copies untouched for 12 months.
 4. Deploy. The production domain is [tilawah.shahadot.dev](https://tilawah.shahadot.dev).
+
+## Use in another app
+
+Tilawah's player and surah list can run inside other websites and mobile apps, free. Open `/widgets` on the site to set it up with a live preview, copy the code, and see how many people use it.
 
 ## Contributing
 
