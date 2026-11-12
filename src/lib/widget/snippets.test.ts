@@ -31,7 +31,7 @@ describe("snippets", () => {
     const custom = snippets(origin, { ...DEFAULT_SETTINGS, name: "https://www.Example.com/x", theme: "dark", size: "compact", accent: "#c2410c", radius: "lg" });
     expect(custom.script).toBe(`<script src="${origin}/embed.js" data-theme="dark" data-size="compact" data-accent="#c2410c" data-radius="lg" data-host="example.com"></script>`);
     expect(custom.iframe).toContain("theme=dark&size=compact&accent=%23c2410c&radius=lg&host=example.com");
-    expect(custom.iframe).toContain("height:15rem");
+    expect(custom.iframe).toContain("height:24rem");
     expect(custom.reactNative).toContain("host=example.com");
     expect(custom.flutter).toContain("theme=dark");
   });

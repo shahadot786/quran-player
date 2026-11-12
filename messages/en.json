@@ -1005,6 +1005,7 @@
     "viewFull": "View full details",
     "nowPlaying": "Now playing",
     "startHint": "Choose a surah to start listening",
+    "chooseSurah": "Choose a surah",
     "reciter": "Reciter",
     "changeReciter": "Change reciter",
     "surahsTitle": "Surahs",
@@ -1075,7 +1076,7 @@
       "options": {
         "theme": "auto follows the visitor's device.",
         "lang": "Language of the widget.",
-        "size": "compact is the player alone, about 15 rem tall.",
+        "size": "compact is the player alone, about 24 rem tall.",
         "style": "koi is the soft mint look; tilawah is the site's own theme.",
         "reciter": "Starting reciter: Mishary Alafasy, Saad Al-Ghamdi, Yasser Al-Dosari, Saud Al-Shuraim, Abu Bakr Al-Shatri. A visitor's own choice is remembered.",
         "accent": "Buttons, the progress marker and the current surah.",

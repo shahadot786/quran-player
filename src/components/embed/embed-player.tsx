@@ -5,24 +5,28 @@ import { useLocale, useTranslations } from "next-intl";
 import { TransportControls } from "@/components/player/transport-controls";
 import { SeekBar } from "@/components/player/seek-bar";
 import { Button } from "@/components/ui/button";
-import { getLocalizedReciterName, getLocalizedSurahName, getLocalizedSurahTranslation } from "@/lib/bengali-data";
-import { detailsUrl } from "@/lib/embed/links";
+import { getLocalizedReciterName, getLocalizedSurahName, getLocalizedSurahTranslation, toBengaliDigits } from "@/lib/bengali-data";
+import { siteLink } from "@/lib/embed/links";
 import { notifyHost } from "@/lib/embed/host-bridge";
 import type { WidgetReciter } from "@/lib/embed/reciters";
-import { getSurah } from "@/lib/surahs";
+import { getSurah, SURAHS } from "@/lib/surahs";
 import { usePlayerStore } from "@/stores/player-store";
 
 export function EmbedPlayer({
   reciter,
   surahId,
   host,
+  compact,
   onStart,
+  onSelect,
   onOpen,
 }: {
   reciter: WidgetReciter;
   surahId: number | null;
   host: string | null;
+  compact: boolean;
   onStart: () => void;
+  onSelect: (surah: number) => void;
   onOpen: () => void;
 }) {
   const t = useTranslations("embed");
@@ -30,7 +34,7 @@ export function EmbedPlayer({
   const locale = useLocale();
   const failed = usePlayerStore((s) => s.status === "error");
   const surah = surahId ? getSurah(surahId) : undefined;
-  const href = detailsUrl({ surah: surahId ?? undefined, host });
+  const href = siteLink("/player", host);
 
   return (
     <section aria-label={player("label")} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm">
@@ -83,6 +87,23 @@ export function EmbedPlayer({
           </a>
         </Button>
       </div>
+      {compact && (
+        <select
+          aria-label={t("chooseSurah")}
+          value={surahId ?? ""}
+          onChange={(event) => onSelect(Number(event.target.value))}
+          className="h-10 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <option value="" disabled>
+            {t("chooseSurah")}
+          </option>
+          {SURAHS.map((item) => (
+            <option key={item.id} value={item.id}>
+              {locale === "bn" ? toBengaliDigits(item.id) : item.id}. {getLocalizedSurahName(item, locale)} · {item.arabicName}
+            </option>
+          ))}
+        </select>
+      )}
     </section>
   );
 }

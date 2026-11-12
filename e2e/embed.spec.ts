@@ -91,19 +91,54 @@ test("shows the player alone at the compact size", async ({ page }) => {
   await expect(page.getByRole("list")).toHaveCount(0);
 });
 
-test("opens the main site in a new tab, on the surah that is playing", async ({ page }) => {
+test("opens the Quran player on the main site in a new tab", async ({ page }) => {
   await mockAudio(page);
   await page.goto("/embed?host=metrokoi-app");
   const link = page.getByRole("link", { name: /^View full details/ });
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link).toHaveAttribute("rel", /noopener/);
-  expect(new URL((await link.getAttribute("href"))!).pathname).toBe("/");
+  const before = new URL((await link.getAttribute("href"))!);
+  expect(before.pathname).toBe("/player");
+  expect(before.searchParams.get("utm_source")).toBe("widget");
+  expect(before.searchParams.get("utm_medium")).toBe("metrokoi-app");
 
   await surahButton(page, "Ya-Sin").click();
-  const url = new URL((await link.getAttribute("href"))!);
-  expect(url.pathname).toBe("/surahs/36");
-  expect(url.searchParams.get("utm_source")).toBe("widget");
-  expect(url.searchParams.get("utm_medium")).toBe("metrokoi-app");
+  expect(new URL((await link.getAttribute("href"))!).pathname).toBe("/player");
+  expect(new URL((await page.getByRole("link", { name: "Powered by Tilawah" }).getAttribute("href"))!).pathname).toBe("/");
+});
+
+test("lets the player-only size pick any surah from a dropdown under the play button", async ({ page }) => {
+  await mockAudio(page);
+  await page.goto("/embed?size=compact");
+  const player = page.getByRole("region", { name: "Audio player" });
+  const picker = player.getByRole("combobox", { name: "Choose a surah" });
+  await expect(picker).toBeVisible();
+  await expect(picker.locator("option")).toHaveCount(115);
+  await expect(picker).toHaveValue("");
+
+  const play = player.getByRole("button", { name: "Play", exact: true });
+  expect((await play.boundingBox())!.y).toBeLessThan((await picker.boundingBox())!.y);
+
+  await picker.selectOption("36");
+  await expect(picker.locator("option:checked")).toHaveText(/^36\. Ya-Sin/);
+  await expect(player.getByRole("heading", { name: "Ya-Sin" })).toBeVisible();
+  await expect(player.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+  await expect(picker).toHaveValue("36");
+
+  await player.getByRole("button", { name: "Next surah" }).click();
+  await expect(player.getByRole("heading", { name: "Ya-Sin" })).toHaveCount(0);
+  await expect(picker).toHaveValue("37");
+});
+
+test("shows the surah dropdown in Bengali, and only at the player-only size", async ({ page }) => {
+  await page.goto("/embed?size=compact&lang=bn");
+  const picker = page.getByRole("combobox", { name: "একটি সূরা বেছে নিন" });
+  await expect(picker).toBeVisible();
+  await expect(picker.locator("option").nth(1)).toHaveText(/^১\. /);
+
+  await page.goto("/embed");
+  await expect(page.getByRole("combobox")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Surahs" })).toBeVisible();
 });
 
 test("shows the visitor's own listening numbers", async ({ page }) => {

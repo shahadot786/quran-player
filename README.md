@@ -153,7 +153,7 @@ The data files are committed. Only re-run `sources`, `timings` and `juzs` when y
 
 ## Quality checks
 
-Everything below also runs in GitHub Actions on every push and pull request:
+Everything below also runs in GitHub Actions on every pull request into `master`:
 
 ```bash
 yarn lint

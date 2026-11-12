@@ -7,7 +7,7 @@ export function snippets(origin: string, settings: Settings = DEFAULT_SETTINGS):
   const web = hostFor(settings, "web");
   const app = hostFor(settings, "app");
   const attributes = [...embedEntries(settings), ["host", web]].map(([name, value]) => ` data-${name}="${value}"`).join("");
-  const height = settings.size === "compact" ? "15rem" : "40rem";
+  const height = settings.size === "compact" ? "24rem" : "40rem";
 
   return {
     script: `<script src="${origin}/embed.js"${attributes}></script>`,

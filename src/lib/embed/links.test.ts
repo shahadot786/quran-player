@@ -1,17 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { detailsUrl } from "./links";
+import { siteLink } from "./links";
 
-describe("detailsUrl", () => {
-  it("points at the home page when no surah is playing", () => {
-    const url = new URL(detailsUrl({ host: null }));
-    expect(url.pathname).toBe("/");
+describe("siteLink", () => {
+  it("opens the Quran player and says it came from the widget", () => {
+    const url = new URL(siteLink("/player", null));
+    expect(url.pathname).toBe("/player");
     expect(url.searchParams.get("utm_source")).toBe("widget");
     expect(url.searchParams.has("utm_medium")).toBe(false);
   });
 
-  it("points at the playing surah and names the host", () => {
-    const url = new URL(detailsUrl({ surah: 36, host: "metrokoi.com" }));
-    expect(url.pathname).toBe("/surahs/36");
-    expect(url.searchParams.get("utm_medium")).toBe("metrokoi.com");
+  it("names the host that sent the visitor", () => {
+    expect(new URL(siteLink("/player", "metrokoi.com")).searchParams.get("utm_medium")).toBe("metrokoi.com");
+  });
+
+  it("can point at the home page", () => {
+    expect(new URL(siteLink("/", "my-app")).pathname).toBe("/");
   });
 });

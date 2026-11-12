@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useEmbedResize } from "@/hooks/use-embed-resize";
 import { moshafQueue } from "@/lib/audio-url";
-import { detailsUrl } from "@/lib/embed/links";
+import { siteLink } from "@/lib/embed/links";
 import type { EmbedOptions } from "@/lib/embed/options";
 import type { WidgetReciter } from "@/lib/embed/reciters";
 import { useHydrated } from "@/stores/hydration";
@@ -47,7 +47,7 @@ export function EmbedWidget({ reciters, options }: { reciters: WidgetReciter[]; 
       ) : (
         <main className="mx-auto flex w-full max-w-xl flex-col gap-3 p-3">
           <EmbedHeader reciters={reciters} reciterId={reciter.id} onChange={changeReciter} />
-          <EmbedPlayer reciter={reciter} surahId={activeSurah} host={options.host} onStart={() => play(1)} onOpen={() => trackEvent("click")} />
+          <EmbedPlayer reciter={reciter} surahId={activeSurah} host={options.host} compact={options.size === "compact"} onStart={() => play(1)} onSelect={play} onOpen={() => trackEvent("click")} />
           {options.size === "full" && (
             <>
               <EmbedStats />
@@ -56,7 +56,7 @@ export function EmbedWidget({ reciters, options }: { reciters: WidgetReciter[]; 
           )}
           <footer className="pb-1 text-center text-xs text-muted-foreground">
             <a
-              href={detailsUrl({ host: options.host })}
+              href={siteLink("/", options.host)}
               target="_blank"
               rel="noopener"
               onClick={() => trackEvent("click")}

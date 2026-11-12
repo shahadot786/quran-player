@@ -16,7 +16,7 @@
   frame.loading = "lazy";
   frame.allow = "autoplay; encrypted-media";
   frame.setAttribute("scrolling", "no");
-  frame.style.cssText = "display:block;width:100%;max-width:36rem;margin:0 auto;border:0;height:" + (script.getAttribute("data-size") === "compact" ? "15rem" : "40rem");
+  frame.style.cssText = "display:block;width:100%;max-width:36rem;margin:0 auto;border:0;height:" + (script.getAttribute("data-size") === "compact" ? "24rem" : "40rem");
 
   window.addEventListener("message", function (event) {
     if (event.origin !== origin || event.source !== frame.contentWindow) return;
