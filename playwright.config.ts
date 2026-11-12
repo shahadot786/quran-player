@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { WIDGET_TEST_SALT } from "./e2e/tracker-env";
 
 const PORT = 3100;
 
@@ -16,5 +17,6 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     timeout: 300_000,
     reuseExistingServer: !process.env.CI,
+    env: { DATABASE_URL: "", WIDGET_SALT: WIDGET_TEST_SALT, WIDGET_TEST_STORE: "memory" },
   },
 });

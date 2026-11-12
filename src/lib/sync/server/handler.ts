@@ -11,22 +11,22 @@ const LIMIT_ROWS_MS = 24 * 60 * 60 * 1000;
 export type SyncDeps = { store: SnapshotStore | null; now: () => Date; secret: string };
 
 const NO_STORE = { "Cache-Control": "no-store" };
-const reply = (status: number, body?: unknown, headers: Record<string, string> = {}) =>
+export const reply = (status: number, body?: unknown, headers: Record<string, string> = {}) =>
   body === undefined ? new Response(null, { status, headers: { ...NO_STORE, ...headers } }) : Response.json(body, { status, headers: { ...NO_STORE, ...headers } });
 
-function bearer(request: Request): string | null {
+export function bearer(request: Request): string | null {
   const match = /^Bearer (\S+)$/.exec(request.headers.get("authorization") ?? "");
   return match ? match[1]! : null;
 }
 
 // Addresses are only kept as a keyed hash, so the counters can't be turned back into who visited.
-async function ipBucket(request: Request, secret: string) {
+export async function ipBucket(request: Request, secret: string) {
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
   return `ip:${await hashKey(`${secret}:${forwarded}`)}`;
 }
 
 // Reads at most `max` bytes, so an oversized body is dropped as it arrives and never held in memory.
-async function readLimited(request: Request, max: number): Promise<string | null> {
+export async function readLimited(request: Request, max: number): Promise<string | null> {
   const declared = Number(request.headers.get("content-length"));
   if (Number.isFinite(declared) && declared > max) return null;
   const reader = request.body?.getReader();
