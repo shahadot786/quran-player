@@ -1,3 +1,4 @@
+/** A short list to fall back on when the full reciter list cannot be loaded. */
 export const WIDGET_RECITER_IDS = [123, 30, 92, 31, 4] as const;
 export const DEFAULT_WIDGET_RECITER = WIDGET_RECITER_IDS[0];
 
@@ -26,6 +27,8 @@ export type EmbedOptions = {
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
+// Whether a reciter exists is checked by the page, which has the list; this only keeps the value sensible.
+const MAX_RECITER_ID = 1_000_000;
 const COLOR_KEYS = ["accent", "bg", "card", "text"] as const;
 const HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const HOST = /^[a-z0-9][a-z0-9.-]{0,63}$/;
@@ -70,7 +73,7 @@ export function parseEmbedOptions(params: SearchParams): EmbedOptions {
     size: pick(first(params.size), ["full", "compact"], "full"),
     style: pick(first(params.style), ["koi", "tilawah"], "koi"),
     radius: pick(first(params.radius), ["sm", "md", "lg"], "md"),
-    reciter: WIDGET_RECITER_IDS.find((id) => id === reciter) ?? DEFAULT_WIDGET_RECITER,
+    reciter: Number.isInteger(reciter) && reciter > 0 && reciter < MAX_RECITER_ID ? reciter : DEFAULT_WIDGET_RECITER,
     colors,
     host: normalizeHost(first(params.host)),
     preview: first(params.preview) === "1",

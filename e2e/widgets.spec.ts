@@ -86,11 +86,13 @@ test("takes colours, and refuses text that is not a colour", async ({ page }) =>
 
 test("starts the preview on the chosen reciter and language", async ({ page }) => {
   await page.goto("/widgets");
-  await page.getByLabel("Starting reciter").selectOption("30");
+  await page.getByRole("button", { name: "Starting reciter" }).click();
+  await page.getByRole("combobox", { name: "Filter reciters" }).fill("ghamdi");
+  await page.getByRole("option", { name: /Saad Al-Ghamdi/ }).click();
   await choose(page, "Widget language", "বাংলা");
   await expect(code(page)).toContainText('data-lang="bn" data-reciter="30"');
   await expect(preview(page).getByRole("heading", { name: "সূরাসমূহ" })).toBeVisible();
-  await expect(preview(page).getByRole("button", { name: /সাদ/ })).toBeVisible();
+  await expect(preview(page).getByRole("button", { name: /^ক্বারী বদলান: সাদ/ })).toBeVisible();
 });
 
 test("keeps the settings in the address, restores them, and can reset", async ({ page }) => {
@@ -114,10 +116,10 @@ test("opens a shared link with the same settings, and ignores bad ones", async (
   await page.goto("/widgets?kind=app&name=Metro%20Koi&theme=dark&lang=bn&reciter=92&accent=%23c2410c");
   await expect(page.getByLabel("App name")).toHaveValue("Metro Koi");
   await expect(group(page, "Theme").getByLabel("Dark")).toBeChecked();
-  await expect(page.getByLabel("Starting reciter")).toHaveValue("92");
+  await expect(page.getByRole("button", { name: "Starting reciter" })).toContainText("Yasser Al-Dosari");
   await expect(page.getByLabel("Accent", { exact: true })).toHaveValue("#c2410c");
 
-  await page.goto("/widgets?kind=robot&theme=pink&reciter=7&accent=nope&name=" + "x".repeat(300));
+  await page.goto("/widgets?kind=robot&theme=pink&reciter=abc&accent=nope&name=" + "x".repeat(300));
   await expect(group(page, "Theme").getByLabel("Auto")).toBeChecked();
   await expect(page.getByLabel("Website address or name")).toHaveValue("x".repeat(100));
 });
